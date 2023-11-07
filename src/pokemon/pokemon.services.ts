@@ -1,9 +1,9 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { Pokemon } from './pokemon.model';
+import { PokemonModel } from './pokemon.model';
 
 @Injectable()
 export class PokemonService {
-  pokemon: Pokemon[] = [];
+  pokemon: PokemonModel[] = [];
 
 
 // Fetching one pokemon from the DB
@@ -19,7 +19,7 @@ export class PokemonService {
 
 
   // Common find 1 Method
-  private findPokemonByID(id: number): [Pokemon, number] {
+  private findPokemonByID(id: number): [PokemonModel, number] {
     const index = this.pokemon.findIndex((user) => pokemon.id == id);
     const pokemon = this.pokemon[index];
     if (!pokemon) throw new NotFoundException('Could not find this pokemon');

@@ -1,5 +1,5 @@
 import { Controller, Get, Param } from '@nestjs/common';
-import { Pokemon } from './pokemon.model';
+import { PokemonModel } from './pokemon.model';
 import { PokemonService } from './pokemon.services';
 
 @Controller('pokemon')

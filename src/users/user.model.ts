@@ -1,9 +1,16 @@
-export class User{
-    constructor(
-        public id:number, 
-        public name:string, 
-        public email:string, 
-        public phone_number:number,
-        public password:string
-    ){};
+import mongoose from 'mongoose';
+
+export const UserSchema = new mongoose.Schema({
+  name: { type: String, required: true },
+  email: { type: String, required: true },
+  phone_number: { type: String, required: true },
+  password: { type: String, required: true },
+});
+
+export interface User extends mongoose.Document {
+  id: number;
+  name: string;
+  email: string;
+  phone_number: number;
+  password: string;
 }

@@ -1,61 +1,50 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
 import { User } from './user.model';
 
 @Injectable()
 export class UserService {
-  users: User[] = [];
+  constructor(@InjectModel('User') readonly userModel: Model<User>) {}
 
-  getOneUser(id: number) {
-    const [user, _] = this.findUser(id);
-    return { ...user };
+  // Get one user
+  async findUser(id:string){
+    const user =  await this.findUser(id)
+    return user
   }
 
-  getAllUsers() {
-    return [...this.users];
+
+  async findAllUsers() {
+    const allUsers = await this.userModel.find();
+    return allUsers.map((user) => ({
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      phone_number: user.phone_number,
+    }))
   }
 
-  createUser(name: string, email: string, phone: number, password: string) {
-    const id = Math.random() * 10;
-    const newUser = new User(id, name, email, phone, password);
-    this.users.push(newUser);
-
-    console.log(`Added User, new id: ${id}`);
-  }
-  // Update ()
-  updateUser(
-    id: number,
+  async createUser(
     name: string,
     email: string,
-    phone: number,
+    phone_number: number,
     password: string,
   ) {
-    const [foundUser, index] = this.findUser(id);
-    const updatedUser = { ...foundUser };
-
-    // Checking if and only update if each field is not null / valid
-    if (name) {
-      updatedUser.name = name;
-    }
-    if (email) {
-      updatedUser.email = email;
-    }
-    if (phone) {
-      updatedUser.phone_number = phone;
-    }
-    this.users[index] = updatedUser;
-  }
-  // Delete ()
-  deleteUser(id: number) {
-    const [_, index] = this.findUser(id);
-    this.users.splice(index, 1);
+    const newUser = new this.userModel({ name, email, phone_number, password });
+    const result = await newUser.save()
+    console.log(result)
   }
 
-  // Common find 1 Method
-  private findUser(id: number): [User, number] {
-    const index = this.users.findIndex((user) => user.id == id);
-    const user = this.users[index];
-    if (!user) throw new NotFoundException('Could not find this User');
-    console.log(index, user);
-    return [user, index];
+  private async  findOneUser(id:string):Promise<User>{
+    let user
+    try{
+      user = await this.userModel.findById(id)
+    } catch(error){
+      throw new NotFoundException('Could not find this user')
+    }
+    if(!user){
+        throw new NotFoundException('Could not find this user')
+      }
+      return user
   }
 }
