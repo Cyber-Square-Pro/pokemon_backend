@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 
 @Injectable()
 export class AppService {
-  getHello(): string {
-    return 'Hello World!';
+  homeRoute(): string {
+    return 'Welcome to Team B Pokemon API!';
   }
 }

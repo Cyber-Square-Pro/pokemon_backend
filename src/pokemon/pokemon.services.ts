@@ -1,29 +1,19 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { PokemonModel } from './pokemon.model';
+import { Pokemon } from './pokemon.model';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
 
 @Injectable()
 export class PokemonService {
-  pokemon: PokemonModel[] = [];
+  constructor(@InjectModel('Pokemon') readonly pokemonModel: Model<Pokemon>) {}
 
+  // Fetching one pokemon from the DB
+  getOnePokemon(id: number) {}
 
-// Fetching one pokemon from the DB
-  getOnePokemon(id: number) {
-    const [pokemon, _] = this.findPokemonByID(id);
-    return { ...pokemon };
-  }
-
-// Returning a copied list of all pokemons from the DB 
-  getAllpokemon() {
-    return [...this.pokemon];
-  }
-
-
+  // Returning a list of all pokemons
+  getAllpokemon() {}
   // Common find 1 Method
-  private findPokemonByID(id: number): [PokemonModel, number] {
-    const index = this.pokemon.findIndex((user) => pokemon.id == id);
-    const pokemon = this.pokemon[index];
-    if (!pokemon) throw new NotFoundException('Could not find this pokemon');
-    console.log(index, pokemon);
-    return [pokemon, index];
+  private async findPokemonByID(id: number): Promise<Pokemon> {
+    return;
   }
 }

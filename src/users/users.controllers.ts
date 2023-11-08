@@ -12,13 +12,19 @@ import { UserService } from './users.services';
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UserService) {}
-
+  
   // Get one user
   @Get(':id')
   async getOneUser(@Param('id') id: string) {
     const foundUser = this.usersService.findUser(id);
     console.log(foundUser);
   }
+@Get()
+async getAllUsers(){
+  const allUsers = this.usersService.findAllUsers()
+  return allUsers
+}
+
   // Create one user
   @Post()
   createUser(
