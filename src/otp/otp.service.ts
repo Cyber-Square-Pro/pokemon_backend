@@ -22,7 +22,7 @@ export class OtpService {
     else return false
   }
 
-  async getStoredOTP(email: string): Promise<String> {
+  async getStoredOTP(email: string): Promise<string> {
     const storedOTP = await this.otpModel.findOne({email:email})
     console.log(storedOTP)
     return storedOTP.otp

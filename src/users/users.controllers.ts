@@ -70,6 +70,13 @@ export class UsersController {
       body.phone_number,
       body.password,
     );
+    return updatedUser
+  }
+
+  //
+  @Delete(':id')
+  deleteUser(@Param('id') id:string){
+    return this.usersService.deleteUser(id)
   }
 
   //
@@ -85,9 +92,9 @@ export class UsersController {
   async verifyEmail(
     @Body('email') email: string,
     @Body('userInputOtp') userInputOtp: string,
-  ): Promise<boolean> {
+  ) {
     
-    const storedOtp = this.otpService.getStoredOTP(email); // Implement a function to retrieve the stored OTP.
+    const storedOtp = await this.otpService.getStoredOTP(email); // Implement a function to retrieve the stored OTP.
     return this.emailVerificationService.verifyEmail(storedOtp, userInputOtp)
   }
 }

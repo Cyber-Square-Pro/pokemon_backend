@@ -7,8 +7,8 @@ export class PokemonController {
   constructor(private readonly pokemonService: PokemonService) {}
 
   // Get one pokemon's details
-  @Get('/:id')
-  getPokemon(@Param('id') id: number): any {
+  @Get(':id')
+  getPokemon(@Param('id') id: string) {
     return this.pokemonService.getOnePokemon(id);
   }
 

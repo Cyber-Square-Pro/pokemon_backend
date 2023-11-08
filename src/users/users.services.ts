@@ -71,6 +71,13 @@ export class UserService {
     updatedUser.save();
   }
 
+  // Deleting a user from the db
+  async deleteUser(id:string):Promise<boolean>{
+    const foundUser = this.findOneUser(id)
+    const result = await (await foundUser).deleteOne()
+    if(result) return true
+    else return false
+  }
   
 
   // Helper method to find one user from mongo db
@@ -87,5 +94,5 @@ export class UserService {
     return user;
   }
 
-  // Helper function to get stored otp
+
 }

@@ -1,9 +1,8 @@
 import { Injectable } from '@nestjs/common'
 import {MailerService } from '../mailer/mailer.service'
-import { UserService } from 'src/users/users.services';
 @Injectable()
 export class EmailVerificationService {
-    constructor(private readonly mailerService: MailerService,private readonly usersService : UserService) {}
+    constructor(private readonly mailerService: MailerService) {}
 
     async sendVerificationEmail(email: string, otp: string): Promise<void> {
       await this.mailerService.sendMail({
@@ -16,7 +15,7 @@ export class EmailVerificationService {
       });
     }
   
-    async verifyEmail(otp: string, userInputOtp: string): Promise<boolean> {
+    verifyEmail(otp: string, userInputOtp: string): boolean {
       return otp === userInputOtp;
     }
 }

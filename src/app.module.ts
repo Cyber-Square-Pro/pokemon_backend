@@ -7,6 +7,7 @@ import { PokemonModule } from './pokemon/pokemon.module';
 import { EmailVerificationModule } from './email.verification/email.verification.module';
 import { MailerService } from './mailer/mailer.service';
 import { OtpModule } from './otp/otp.module';
+import { MailerModule } from './mailer/mailer.module';
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import { OtpModule } from './otp/otp.module';
     PokemonModule,
     EmailVerificationModule,
     OtpModule,
+    MailerModule,
   ],
   controllers: [AppController],
   providers: [AppService, MailerService],

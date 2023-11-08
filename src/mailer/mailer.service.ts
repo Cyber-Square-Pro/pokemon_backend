@@ -8,6 +8,7 @@ export class MailerService {
     template: string;
     context: object;
   }) {
+    console.log('Mail has been sent to the user')
     console.log(mail)
   }
 }

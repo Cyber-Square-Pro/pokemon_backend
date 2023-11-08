@@ -6,7 +6,7 @@ export const OtpSchema = new mongoose.Schema({
   createdAt: { type: Date, default: Date.now },
 });
 
-export interface Otp {
+export interface Otp extends mongoose.Document {
   email: string;
   otp: string;
   createdAt: Date;
