@@ -1,15 +1,15 @@
 import { Injectable } from '@nestjs/common'
 import {MailerService } from '../mailer/mailer.service'
+import { UserService } from 'src/users/users.services';
 @Injectable()
 export class EmailVerificationService {
-    constructor(private readonly mailerService: MailerService) {}
+    constructor(private readonly mailerService: MailerService,private readonly usersService : UserService) {}
 
     async sendVerificationEmail(email: string, otp: string): Promise<void> {
-      // Use the MailerService to send an email with the OTP to the user's email address.
       await this.mailerService.sendMail({
         to: email,
         subject: 'Email Verification from Pokemon App',
-        template: 'email-verification', // Create an email template in your app.
+        template: 'email-verification', 
         context: {
           otp,
         },
@@ -17,7 +17,6 @@ export class EmailVerificationService {
     }
   
     async verifyEmail(otp: string, userInputOtp: string): Promise<boolean> {
-      // Compare the OTP provided by the user with the generated OTP.
       return otp === userInputOtp;
     }
 }

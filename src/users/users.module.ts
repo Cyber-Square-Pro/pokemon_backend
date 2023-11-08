@@ -3,12 +3,12 @@ import { UsersController } from './users.controllers';
 import { UserService } from './users.services';
 import { MongooseModule } from '@nestjs/mongoose';
 import { UserSchema } from './user.model';
-import { EmailVerificationService } from 'src/email.verification/email.verification.service';
+import { EmailVerificationModule } from 'src/email.verification/email.verification.module';
 
 @Module({
   imports: [
     MongooseModule.forFeature([{ name: 'User', schema: UserSchema }]),
-    EmailVerificationService,
+    EmailVerificationModule,
   ],
   controllers: [UsersController],
   providers: [UserService],

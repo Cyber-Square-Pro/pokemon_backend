@@ -6,6 +6,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { PokemonModule } from './pokemon/pokemon.module';
 import { EmailVerificationModule } from './email.verification/email.verification.module';
 import { MailerService } from './mailer/mailer.service';
+import { OtpModule } from './otp/otp.module';
 
 @Module({
   imports: [
@@ -13,6 +14,7 @@ import { MailerService } from './mailer/mailer.service';
     UsersModule,
     PokemonModule,
     EmailVerificationModule,
+    OtpModule,
   ],
   controllers: [AppController],
   providers: [AppService, MailerService],

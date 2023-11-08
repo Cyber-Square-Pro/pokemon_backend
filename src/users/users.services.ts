@@ -41,7 +41,8 @@ export class UserService {
     const newUser = new this.userModel({ name, email, phone_number, password });
     const result = await newUser.save();
     console.log(result);
-    return newUser.id;
+    if (result) return true
+    else return false
   }
 
   // update a user
@@ -70,6 +71,8 @@ export class UserService {
     updatedUser.save();
   }
 
+  
+
   // Helper method to find one user from mongo db
   private async findOneUser(id: string): Promise<User> {
     let user: User;
@@ -83,4 +86,6 @@ export class UserService {
     }
     return user;
   }
+
+  // Helper function to get stored otp
 }
