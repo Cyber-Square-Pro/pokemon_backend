@@ -7,7 +7,7 @@ import { Model } from 'mongoose';
 export class PokemonService {
   constructor(@InjectModel('Pokemon') readonly pokemonModel: Model<Pokemon>) {}
 
-  // Fetching one pokemon from the DB
+  // Fetching one pokemon
   async getOnePokemon(id: string):Promise<Pokemon> {
     const foundPokemon = await this.findPokemonByID(id)
     return foundPokemon
@@ -17,7 +17,8 @@ export class PokemonService {
   async getAllpokemon():Promise<Pokemon[]> {
     return await this.pokemonModel.find()
   }
-  // Helper method to find one pokemon
+ 
+  
   private async findPokemonByID(id: string): Promise<Pokemon> {
     let pokemon:Pokemon
     try {

@@ -21,8 +21,14 @@ export class UsersController {
 
   // Get one user
   @Get(':id')
-  async getOneUser(@Param('id') id: string) {
-    const foundUser = this.usersService.findUser(id);
+  async getUserById(@Param('id') id: string) {
+    const foundUser = this.usersService.findUserById(id);
+    console.log(foundUser)
+  }
+  // Get one user by email
+  @Post(':email')
+  async getUserByEmail(@Param('email') email: string) {
+    const foundUser = this.usersService.findUserByEmail(email);
     console.log(foundUser)
   }
   @Get()
@@ -63,7 +69,7 @@ export class UsersController {
       password: string;
     },
   ) {
-    const updatedUser = this.usersService.updateUser(
+    const updatedUser = this.usersService.updateUserById(
       id,
       body.name,
       body.email,
@@ -73,31 +79,37 @@ export class UsersController {
     return updatedUser
   }
 
-  //
+  // delete user by id
   @Delete(':id')
   deleteUser(@Param('id') id:string){
-    return this.usersService.deleteUser(id)
+    return this.usersService.deleteUserById(id)
   }
 
-  //
-  //
+
+
+
   @Post('send-verification-email')
-  async sendVerificationEmail(@Body() email:string): Promise<void> {
-    const otp = this.otpService.generateOTP() // Implement a function to generate OTP.
-    await this.emailVerificationService.sendVerificationEmail(email, otp)
-   
+  async sendVerificationEmail(@Body('email') email:string) {
+
+    // Generating a random OTP and storing that + user's email
+    const generatedOTP = this.otpService.generateOTP() 
+     this.otpService.storeOTP(email,generatedOTP)
+    const res = await this.emailVerificationService.sendVerificationEmail(email, generatedOTP)
+    if(res) return {'message':'OTP has been sent to your mail'}
+
   }
 
   @Post('verify-email')
   async verifyEmail(
     @Body('email') email: string,
-    @Body('userInputOtp') userInputOtp: string,
+    @Body('userEnteredOTP') userEnteredOTP: number,
   ) {
     
-    const storedOtp = await this.otpService.getStoredOTP(email); // Implement a function to retrieve the stored OTP.
-    return this.emailVerificationService.verifyEmail(storedOtp, userInputOtp)
+    // comparing the user entered otp (from otp entry screen) to the stored otp
+    const storedOtp = await this.otpService.getStoredOTP(email); 
+    const verifyResult =  this.emailVerificationService.verifyEmail(storedOtp, userEnteredOTP)
+    if(verifyResult) return {'message':"Succesfully Verified EMail"}
+    else return {'message':'Failed to verify'}
   }
 }
-
-
 

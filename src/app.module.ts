@@ -8,6 +8,8 @@ import { EmailVerificationModule } from './email.verification/email.verification
 import { MailerService } from './mailer/mailer.service';
 import { OtpModule } from './otp/otp.module';
 import { MailerModule } from './mailer/mailer.module';
+import { AuthService } from './auth/auth.service';
+import { AuthController } from './auth/auth.controller';
 
 @Module({
   imports: [
@@ -18,7 +20,7 @@ import { MailerModule } from './mailer/mailer.module';
     OtpModule,
     MailerModule,
   ],
-  controllers: [AppController],
-  providers: [AppService, MailerService],
+  controllers: [AppController, AuthController],
+  providers: [AppService, MailerService, AuthService],
 })
 export class AppModule {}

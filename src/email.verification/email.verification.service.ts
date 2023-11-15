@@ -4,18 +4,21 @@ import {MailerService } from '../mailer/mailer.service'
 export class EmailVerificationService {
     constructor(private readonly mailerService: MailerService) {}
 
-    async sendVerificationEmail(email: string, otp: string): Promise<void> {
-      await this.mailerService.sendMail({
+    async sendVerificationEmail(email: string, otp: number):Promise<boolean> {
+     const res =  await this.mailerService.sendMail({
         to: email,
         subject: 'Email Verification from Pokemon App',
-        template: 'email-verification', 
+        template: `email-verification \n OTP: ${otp}`, 
         context: {
           otp,
         },
       });
+      if(res) return true
+      else return false
+
     }
   
-    verifyEmail(otp: string, userInputOtp: string): boolean {
-      return otp === userInputOtp;
+    verifyEmail(otp: number, userEnteredOTP: number): boolean {
+      return otp === userEnteredOTP;
     }
 }

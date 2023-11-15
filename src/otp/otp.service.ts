@@ -7,12 +7,12 @@ import { Otp } from './otp.model';
 export class OtpService {
   constructor(@InjectModel('Otp') readonly otpModel:Model<Otp>){}
 
-  generateOTP(): string {
-    const otp = Math.floor(1000 + Math.random() * 9000).toString();
+  generateOTP(): number {
+    const otp = Math.floor(100000 + Math.random() * 900000)
     return otp;
   }
 
-  async storeOTP(email: string, otp: string): Promise<boolean> {
+  async storeOTP(email: string, otp: number):Promise<boolean> {
     const storedOTP = new this.otpModel({
       email,
       otp
@@ -22,9 +22,8 @@ export class OtpService {
     else return false
   }
 
-  async getStoredOTP(email: string): Promise<string> {
+  async getStoredOTP(email: string):Promise<number> {
     const storedOTP = await this.otpModel.findOne({email:email})
-    console.log(storedOTP)
     return storedOTP.otp
   }
 }

@@ -8,8 +8,19 @@ export class UserService {
   constructor(@InjectModel('User') readonly userModel: Model<User>) {}
 
   // find one user
-  async findUser(id: string) {
+  async findUserById(id: string) {
     const user = await this.findOneUser(id);
+    return {
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      phone_number: user.phone_number,
+      password: user.password,
+    };
+  }
+  // find one user by email
+  async findUserByEmail(email: string) {
+    const user = await this.findOneByEmail(email);
     return {
       id: user.id,
       name: user.name,
@@ -46,7 +57,7 @@ export class UserService {
   }
 
   // update a user
-  async updateUser(
+  async updateUserById(
     id: string,
     name: string,
     email: string,
@@ -72,7 +83,7 @@ export class UserService {
   }
 
   // Deleting a user from the db
-  async deleteUser(id:string):Promise<boolean>{
+  async deleteUserById(id:string):Promise<boolean>{
     const foundUser = this.findOneUser(id)
     const result = await (await foundUser).deleteOne()
     if(result) return true
@@ -85,6 +96,19 @@ export class UserService {
     let user: User;
     try {
       user = await this.userModel.findById(id);
+    } catch (error) {
+      throw new NotFoundException('Could not find this user');
+    }
+    if (!user) {
+      throw new NotFoundException('Could not find this user');
+    }
+    return user;
+  }
+  // Helper method to find one user from mongo db
+  private async findOneByEmail(email: string): Promise<User> {
+    let user: User;
+    try {
+      user = await this.userModel.findOne({email:email});
     } catch (error) {
       throw new NotFoundException('Could not find this user');
     }
