@@ -26,10 +26,11 @@ export class UsersController {
     console.log(foundUser)
   }
   // Get one user by email
-  @Post(':email')
-  async getUserByEmail(@Param('email') email: string) {
+  @Post()
+  async getUserByEmail(@Body('email') email: string) {
     const foundUser = this.usersService.findUserByEmail(email);
     console.log(foundUser)
+    return foundUser
   }
   @Get()
   async getAllUsers() {
@@ -86,13 +87,12 @@ export class UsersController {
   }
 
 
-
-
   @Post('send-verification-email')
   async sendVerificationEmail(@Body('email') email:string) {
 
     // Generating a random OTP and storing that + user's email
     const generatedOTP = this.otpService.generateOTP() 
+    console.log(generatedOTP)
      this.otpService.storeOTP(email,generatedOTP)
     const res = await this.emailVerificationService.sendVerificationEmail(email, generatedOTP)
     if(res) return {'message':'OTP has been sent to your mail'}
@@ -102,12 +102,14 @@ export class UsersController {
   @Post('verify-email')
   async verifyEmail(
     @Body('email') email: string,
-    @Body('userEnteredOTP') userEnteredOTP: number,
+    @Body('otp') userEnteredOTP: number,
   ) {
     
     // comparing the user entered otp (from otp entry screen) to the stored otp
-    const storedOtp = await this.otpService.getStoredOTP(email); 
-    const verifyResult =  this.emailVerificationService.verifyEmail(storedOtp, userEnteredOTP)
+    const storedOtp = await this.otpService.getStoredOTP(email);
+    console.log(storedOtp) 
+    const verifyResult =  await this.emailVerificationService.verifyEmail(storedOtp, userEnteredOTP)
+    console.log(verifyResult)
     if(verifyResult) return {'message':"Succesfully Verified EMail"}
     else return {'message':'Failed to verify'}
   }

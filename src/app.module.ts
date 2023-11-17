@@ -10,17 +10,22 @@ import { OtpModule } from './otp/otp.module';
 import { MailerModule } from './mailer/mailer.module';
 import { AuthService } from './auth/auth.service';
 import { AuthController } from './auth/auth.controller';
+import { AuthModule } from './auth/auth.module';
+import { UserService } from './users/users.services';
+import { UserSchema } from './users/user.model';
 
 @Module({
   imports: [
-    MongooseModule.forRoot('mongodb://localhost:27017/pokemon_db'),
     UsersModule,
+    MongooseModule.forFeature([{ name: 'User', schema: UserSchema }]),
+    MongooseModule.forRoot('mongodb://localhost:27017/pokemon_db'),
+    AuthModule,
     PokemonModule,
     EmailVerificationModule,
     OtpModule,
     MailerModule,
   ],
   controllers: [AppController, AuthController],
-  providers: [AppService, MailerService, AuthService],
+  providers: [UserService,AppService, MailerService,  AuthService],
 })
 export class AppModule {}

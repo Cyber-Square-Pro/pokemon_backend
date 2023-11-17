@@ -20,6 +20,7 @@ export class MailerService {
       text:`Your verification OTP Number is as follows: ${otp} \n`,
     }
 
-   return this.transporter.sendMail(mailOptions)
+  //  return this.transporter.sendMail(mailOptions)
+  return true
   }
 }
