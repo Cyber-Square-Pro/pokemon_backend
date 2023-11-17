@@ -107,9 +107,7 @@ export class UsersController {
     
     // comparing the user entered otp (from otp entry screen) to the stored otp
     const storedOtp = await this.otpService.getStoredOTP(email);
-    console.log(storedOtp) 
     const verifyResult =  await this.emailVerificationService.verifyEmail(storedOtp, userEnteredOTP)
-    console.log(verifyResult)
     if(verifyResult) return {'message':"Succesfully Verified EMail"}
     else return {'message':'Failed to verify'}
   }
