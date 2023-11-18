@@ -1,8 +1,10 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Delete,
   Get,
+  InternalServerErrorException,
   Param,
   Patch,
   Post,
@@ -20,27 +22,26 @@ export class UsersController {
   ) {}
 
   // Get one user
-  @Get(':id')
-  async getUserById(@Param('id') id: string) {
-    const foundUser = this.usersService.findUserById(id);
-    console.log(foundUser)
+  @Post()
+  async getUserById(@Body('id') id: string) {
+    const result = await this.usersService.findUserById(id);
+    return result;
   }
   // Get one user by email
   @Post()
   async getUserByEmail(@Body('email') email: string) {
-    const foundUser = this.usersService.findUserByEmail(email);
-    console.log(foundUser)
-    return foundUser
+    const result = await this.usersService.findUserByEmail(email);
+    return result;
   }
   @Get()
   async getAllUsers() {
-    const allUsers = this.usersService.findAllUsers();
-    return allUsers
+    const result = this.usersService.findAllUsers();
+    return result;
   }
 
   // Create one user
-  @Post()
-  createUser(
+  @Post('sign-up')
+  async createUser(
     @Body()
     body: {
       name: string;
@@ -49,13 +50,16 @@ export class UsersController {
       password: string;
     },
   ) {
-    const result = this.usersService.createUser(
-      body.name,
-      body.email,
-      body.phone_number,
-      body.password,
-    );
-    return result;
+
+      const result = await this.usersService.createUser(
+        body.name,
+        body.email,
+        body.phone_number,
+        body.password,
+      );
+    if (result) return {message:'Created user succesfully'};
+    else throw new InternalServerErrorException('Failed to create user')
+    
   }
 
   //Update User
@@ -77,26 +81,27 @@ export class UsersController {
       body.phone_number,
       body.password,
     );
-    return updatedUser
+    return updatedUser;
   }
 
   // delete user by id
   @Delete(':id')
-  deleteUser(@Param('id') id:string){
-    return this.usersService.deleteUserById(id)
+  deleteUser(@Param('id') id: string) {
+    return this.usersService.deleteUserById(id);
   }
 
-
   @Post('send-verification-email')
-  async sendVerificationEmail(@Body('email') email:string) {
-
+  async sendVerificationEmail(@Body('email') email: string) {
     // Generating a random OTP and storing that + user's email
-    const generatedOTP = this.otpService.generateOTP() 
-    console.log(generatedOTP)
-     this.otpService.storeOTP(email,generatedOTP)
-    const res = await this.emailVerificationService.sendVerificationEmail(email, generatedOTP)
-    if(res) return {'message':'OTP has been sent to your mail'}
-
+    const generatedOTP =  this.otpService.generateOTP();
+    await this.otpService.storeOTP(email, generatedOTP);
+    const res = await this.emailVerificationService.sendVerificationEmail(
+      email,
+      generatedOTP,
+    );
+    if (res)
+      return { message: `OTP has been sent to your mail-> OTP ${generatedOTP}` };
+    else throw new InternalServerErrorException('Failed to send OTP');
   }
 
   @Post('verify-email')
@@ -104,12 +109,24 @@ export class UsersController {
     @Body('email') email: string,
     @Body('otp') userEnteredOTP: number,
   ) {
-    
-    // comparing the user entered otp (from otp entry screen) to the stored otp
-    const storedOtp = await this.otpService.getStoredOTP(email);
-    const verifyResult =  await this.emailVerificationService.verifyEmail(storedOtp, userEnteredOTP)
-    if(verifyResult) return {'message':"Succesfully Verified EMail"}
-    else return {'message':'Failed to verify'}
+    try {
+      const storedOtp = await this.otpService.getStoredOTP(email);
+      const verifyResult = await this.emailVerificationService.verifyEmail(
+        storedOtp,
+        userEnteredOTP,
+      );
+
+      if (verifyResult) {
+        return { message: 'Successfully Verified Email' };
+      } else {
+        throw new BadRequestException('Failed to verify email: Invalid OTP');
+      }
+    } catch (error) {
+      // Log the error for server-side debugging
+      console.error('Error during email verification:', error);
+
+      // Return a generic error response
+      throw new InternalServerErrorException('Error during email verification\n ',error);
+    }
   }
 }
-

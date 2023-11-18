@@ -1,7 +1,12 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { User } from './user.model';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UserService {
@@ -10,30 +15,18 @@ export class UserService {
   // find one user
   async findUserById(id: string) {
     const user = await this.findOneUser(id);
-    return {
-      id: user.id,
-      name: user.name,
-      email: user.email,
-      phone_number: user.phone_number,
-      password: user.password,
-    };
+    return user;
   }
   // find one user by email
   async findUserByEmail(email: string) {
     const user = await this.findOneByEmail(email);
-    return {
-      id: user.id,
-      name: user.name,
-      email: user.email,
-      phone_number: user.phone_number,
-      password: user.password,
-    };
+    return user;
   }
 
   // find all users
   async findAllUsers() {
-    const allUsers = await this.userModel.find();
-    return allUsers.map((user) => ({
+    const result = await this.userModel.find();
+    return result.map((user) => ({
       id: user.id,
       name: user.name,
       email: user.email,
@@ -49,11 +42,16 @@ export class UserService {
     phone_number: number,
     password: string,
   ) {
-    const newUser = new this.userModel({ name, email, phone_number, password });
+    let hashedPass = await bcrypt.hash(password, 3);
+    // console.log(hashedPass)
+    const newUser = new this.userModel({
+      name,
+      email,
+      phone_number,
+      password,
+    });
     const result = await newUser.save();
-    console.log(result);
-    if (result) return true
-    else return false
+    return result;
   }
 
   // update a user
@@ -83,13 +81,12 @@ export class UserService {
   }
 
   // Deleting a user from the db
-  async deleteUserById(id:string):Promise<boolean>{
-    const foundUser = this.findOneUser(id)
-    const result = await (await foundUser).deleteOne()
-    if(result) return true
-    else return false
+  async deleteUserById(id: string): Promise<boolean> {
+    const foundUser = this.findOneUser(id);
+    const result = await (await foundUser).deleteOne();
+    if (result) return true;
+    else return false;
   }
-  
 
   // Helper method to find one user from mongo db
   private async findOneUser(id: string): Promise<User> {
@@ -108,8 +105,7 @@ export class UserService {
   private async findOneByEmail(email: string): Promise<User> {
     let user: User;
     try {
-      user = await this.userModel.findOne({email:email}).exec()
-      console.log(user)
+      user = await this.userModel.findOne({ email }).exec();
     } catch (error) {
       throw new NotFoundException('Could not find this user');
     }

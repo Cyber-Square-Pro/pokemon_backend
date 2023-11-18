@@ -2,30 +2,45 @@ import { Injectable } from '@nestjs/common'
 import * as nodemailer from 'nodemailer'
 @Injectable()
 export class MailerService {
-  private gmailUser: string = process.env.GMAIL_USER;
-  private gmailPass: string = process.env.GMAIL_PASS;
-  private transporter
+  constructor(){}
+  // private envUser: string = process.env.USER;
+  // private envPass: string = process.env.PASS;
+  // private transporter
 
-  constructor(){
-    this.transporter = nodemailer.createTransport({
-      service: 'gmail',
-      auth: {
-        user: this.gmailUser,
-        pass: this.gmailPass
-      },
-    })
+  
+  //constructor(){
+  //   this.transporter = nodemailer.createTransport({
+  //     host:'live.smtp.mailtrap.io',
+  //     port:2525,
+  //     auth: {
+  //       user: this.envUser,
+  //       pass: this.envPass
+  //     },
+  //   })
+  // }
+  //}
+  
+  // async sendVerificationEmail(email: string, otp: number) {
+  //   const mailOptions = {
+  //     from: 'pokemon.team.b@gmail.com',
+  //     to: email,
+  //     subject: 'Email Verification for Pokemon App',
+  //     text: `Your verification OTP Number is as follows: ${otp} \n`,
+  //   };
+  
+  //   try {
+  //     const result = await this.transporter.sendMail(mailOptions);
+  //     console.log('Email sent:', result);
+  //     return result;
+  //   } catch (error) {
+  //     console.error('Error sending email:', error);
+  //     throw error; // rethrow the error to propagate it further
+  //   }
+  // }
+
+  async sendVerificationEmail(email:string, otp:number){
+    return true
   }
 
-  async sendVerificationEmail(email:string,otp:number) {
-
-    const mailOptions = {
-      from:'pokemon.team.b@gmail.com',
-      to:email,
-      subject:'Email Verification for Pokemon App',
-      text:`Your verification OTP Number is as follows: ${otp} \n`,
-    }
-
-  //  return this.transporter.sendMail(mailOptions)
-  return true
-  }
+  
 }
