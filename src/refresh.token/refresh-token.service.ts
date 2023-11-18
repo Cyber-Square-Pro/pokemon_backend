@@ -8,8 +8,8 @@ import { RefreshToken } from './refresh-token.model';
 export class RefreshTokenService {
   constructor(@InjectModel('RefreshToken') private readonly refreshTokenModel: Model<RefreshToken>) {}
 
-  async createRefreshToken(email: string): Promise<RefreshToken> {
-    const refreshToken = new this.refreshTokenModel({ email });
+  async createRefreshToken(token:string,user: string,): Promise<RefreshToken> {
+    const refreshToken = await this.refreshTokenModel.create({token:token,user:user})
     return refreshToken.save();
   } 
 
@@ -20,4 +20,8 @@ export class RefreshTokenService {
   async deleteRefreshToken(token: string): Promise<void> {
     await this.refreshTokenModel.findOneAndDelete({ token }).exec();
   }
+  async deleteRefreshTokenByUser(userId: string): Promise<void> {
+    await this.refreshTokenModel.deleteMany({ user: userId }).exec();
+  }
+  
 }

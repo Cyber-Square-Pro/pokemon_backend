@@ -11,6 +11,7 @@ import {
 import { AuthService } from './auth.service';
 import { User } from '../users/user.model';
 import { JwtAuthGuard } from './auth.guard';
+import { AuthGuard } from '@nestjs/passport';
 // import { RefreshTokenGuard } from '../refresh.token/refresh-token.guard';
 
 @Controller('auth')
@@ -32,10 +33,14 @@ export class AuthController {
     @Body('email') email: string,
     @Body('password') password: string,
   ): Promise<{ accessToken: string; refreshToken: string }> {
-    return this.authService.login(email, password);
+    return await this.authService.login(email, password);
   }
+
+
   @Delete('logout')
-  async logout() {}
+  async logout(@Request() req) {
+    await this.authService.logout(req.user)
+  }
 
   @Get('protected')
   @UseGuards(JwtAuthGuard)

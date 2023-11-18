@@ -16,9 +16,11 @@ import { UserSchema } from './users/user.model';
 import { JwtService } from '@nestjs/jwt';
 import { RefreshTokenService } from './refresh.token/refresh-token.service';
 import { RefreshTokenSchema } from './refresh.token/refresh-token.model';
+import { PassportModule } from '@nestjs/passport';
 
 @Module({
   imports: [
+    PassportModule.register({ defaultStrategy: 'jwt' }),
     UsersModule,
     MongooseModule.forFeature([{ name: 'User', schema: UserSchema }]),
     MongooseModule.forFeature([

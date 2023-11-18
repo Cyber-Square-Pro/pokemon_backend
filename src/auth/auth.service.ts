@@ -4,13 +4,15 @@ import { JwtService } from '@nestjs/jwt';
 import { UserService } from '../users/users.services';
 import * as bcrypt from 'bcrypt';
 import { User } from '../users/user.model';
-import { RefreshToken } from '../refresh.token/refresh-token.model';
+import { RefreshTokenService } from 'src/refresh.token/refresh-token.service';
+
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly userService: UserService,
     private readonly jwtService: JwtService,
+    private readonly refreshTokenService: RefreshTokenService,
   ) {}
 
   async register(
@@ -56,13 +58,13 @@ export class AuthService {
         expiresIn: '7d',
       },
     );
-
+  
     // Create a new RefreshToken document
-    const refreshToken = new RefreshToken({ token, user: user._id })
-    await refreshToken.save()
-
+    await this.refreshTokenService.createRefreshToken(token,user._id);
+  
     return token;
   }
+  
 
   private async comparePasswords(
     enteredPassword: string,
@@ -70,4 +72,10 @@ export class AuthService {
   ): Promise<boolean> {
     return await bcrypt.compare(enteredPassword, storedPassword)
   }
+
+
+  async logout(user: User): Promise<void> {
+    await this.refreshTokenService.deleteRefreshToken(user._id);
+  }
+  
 }
