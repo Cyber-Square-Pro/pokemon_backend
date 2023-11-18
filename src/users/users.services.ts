@@ -48,7 +48,7 @@ export class UserService {
       name,
       email,
       phone_number,
-      password,
+      password:hashedPass,
     });
     const result = await newUser.save();
     return result;

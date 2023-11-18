@@ -50,7 +50,6 @@ export class UsersController {
       password: string;
     },
   ) {
-
       const result = await this.usersService.createUser(
         body.name,
         body.email,

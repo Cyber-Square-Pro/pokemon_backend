@@ -1,6 +1,17 @@
 // auth.controller.ts
-import { Controller, Post, Body } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Body,
+  Get,
+  UseGuards,
+  Request,
+  Delete,
+} from '@nestjs/common';
 import { AuthService } from './auth.service';
+import { User } from '../users/user.model';
+import { JwtAuthGuard } from './auth.guard';
+// import { RefreshTokenGuard } from '../refresh.token/refresh-token.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -12,7 +23,7 @@ export class AuthController {
     @Body('email') email: string,
     @Body('phone_number') phone: number,
     @Body('password') password: string,
-  ): Promise<string> {
+  ): Promise<User> {
     return this.authService.register(name, email, phone, password);
   }
 
@@ -20,7 +31,15 @@ export class AuthController {
   async login(
     @Body('email') email: string,
     @Body('password') password: string,
-  ): Promise<string> {
+  ): Promise<{ accessToken: string; refreshToken: string }> {
     return this.authService.login(email, password);
+  }
+  @Delete('logout')
+  async logout() {}
+
+  @Get('protected')
+  @UseGuards(JwtAuthGuard)
+  protected(@Request() req) {
+    return { message: 'You are authorized to be here', user: req.user };
   }
 }

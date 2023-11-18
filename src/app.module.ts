@@ -14,11 +14,16 @@ import { AuthModule } from './auth/auth.module';
 import { UserService } from './users/users.services';
 import { UserSchema } from './users/user.model';
 import { JwtService } from '@nestjs/jwt';
+import { RefreshTokenService } from './refresh.token/refresh-token.service';
+import { RefreshTokenSchema } from './refresh.token/refresh-token.model';
 
 @Module({
   imports: [
     UsersModule,
     MongooseModule.forFeature([{ name: 'User', schema: UserSchema }]),
+    MongooseModule.forFeature([
+      { name: 'RefreshToken', schema: RefreshTokenSchema },
+    ]),
     MongooseModule.forRoot('mongodb://localhost:27017/pokemon_db'),
     AuthModule,
     PokemonModule,
@@ -27,6 +32,13 @@ import { JwtService } from '@nestjs/jwt';
     MailerModule,
   ],
   controllers: [AppController, AuthController],
-  providers: [UserService,JwtService,AppService, MailerService,  AuthService],
+  providers: [
+    UserService,
+    JwtService,
+    AppService,
+    MailerService,
+    RefreshTokenService,
+    AuthService,
+  ],
 })
 export class AppModule {}
