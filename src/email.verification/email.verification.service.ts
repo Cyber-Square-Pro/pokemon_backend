@@ -12,6 +12,6 @@ export class EmailVerificationService {
     }
   
     async verifyEmail(otp: number, userEnteredOTP: number): Promise<boolean> {
-      return await otp == userEnteredOTP;
+      return  otp == userEnteredOTP;
     }
 }

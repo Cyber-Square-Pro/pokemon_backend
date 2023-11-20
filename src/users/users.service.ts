@@ -1,5 +1,4 @@
 import {
-  BadRequestException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -14,12 +13,12 @@ export class UserService {
 
   // find one user
   async findUserById(id: string) {
-    const user = await this.findOneUser(id);
+    const user = await this.findOne(id);
     return user;
   }
   // find one user by email
-  async findUserByEmail(email: string) {
-    const user = await this.findOneByEmail(email);
+  async findUserByName(name: string) {
+    const user = await this.findOneByName(name);
     return user;
   }
 
@@ -62,7 +61,7 @@ export class UserService {
     phone_number: number,
     password: string,
   ) {
-    const updatedUser = await this.findOneUser(id);
+    const updatedUser = await this.findOne(id);
 
     if (name) {
       updatedUser.name = name;
@@ -77,19 +76,19 @@ export class UserService {
       updatedUser.password = password;
     }
 
-    updatedUser.save();
+    return updatedUser.save();
   }
 
   // Deleting a user from the db
   async deleteUserById(id: string): Promise<boolean> {
-    const foundUser = this.findOneUser(id);
+    const foundUser = this.findOne(id);
     const result = await (await foundUser).deleteOne();
     if (result) return true;
     else return false;
   }
 
   // Helper method to find one user from mongo db
-  private async findOneUser(id: string): Promise<User> {
+  private async findOne(id: string): Promise<User> {
     let user: User;
     try {
       user = await this.userModel.findById(id);
@@ -102,10 +101,10 @@ export class UserService {
     return user;
   }
   // Helper method to find one user from mongo db
-  private async findOneByEmail(email: string): Promise<User> {
+  private async findOneByName(name: string): Promise<User> {
     let user: User;
     try {
-      user = await this.userModel.findOne({ email }).exec();
+      user = await this.userModel.findOne({ name }).exec();
     } catch (error) {
       throw new NotFoundException('Could not find this user');
     }

@@ -3,6 +3,7 @@ import { EmailVerificationService } from './email.verification.service';
 import { MailerService } from 'src/mailer/mailer.service';
 
 @Module({
-  providers: [EmailVerificationService, MailerService]
+  providers: [EmailVerificationService, MailerService],
+  controllers: []
 })
 export class EmailVerificationModule {}

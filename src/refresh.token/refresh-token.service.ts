@@ -16,6 +16,9 @@ export class RefreshTokenService {
   async findRefreshToken(token: string): Promise<RefreshToken | null> {
     return this.refreshTokenModel.findOne({ token }).exec();
   }
+  async findRefreshTokenByUserId(userId: string): Promise<RefreshToken | null> {
+    return this.refreshTokenModel.findOne({ user:userId }).exec();
+  }
 
   async deleteRefreshToken(token: string): Promise<void> {
     await this.refreshTokenModel.findOneAndDelete({ token }).exec();

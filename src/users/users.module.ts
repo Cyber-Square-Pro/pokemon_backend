@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { UsersController } from './users.controllers';
-import { UserService } from './users.services';
+import { UserService } from './users.service';
 import { MongooseModule } from '@nestjs/mongoose';
 import { UserSchema } from './user.model';
 import { EmailVerificationModule } from 'src/email.verification/email.verification.module';

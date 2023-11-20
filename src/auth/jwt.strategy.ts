@@ -2,7 +2,7 @@
 import { Strategy, ExtractJwt } from 'passport-jwt';
 import { PassportStrategy } from '@nestjs/passport';
 import { Injectable, UnauthorizedException } from '@nestjs/common';
-import { UserService } from '../users/users.services';
+import { UserService } from '../users/users.service';
 import { JwtPayload } from './jwt-payload.interface';
 import { JwtService } from '@nestjs/jwt';
 import { RefreshTokenService } from '../refresh.token/refresh-token.service';
@@ -15,21 +15,23 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     private readonly refreshTokenService: RefreshTokenService,
   ) {
     super({
-      jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken,
+      jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       secretOrKey: process.env.ACCESS_TOKEN_SECRET,
     });
   }
 
   async validate(payload: JwtPayload) {
-    const user = await this.userService.findUserByEmail(payload.email);
-    console.log(payload.email,user)
-    if (!user) {
+    const user = await this.userService.findUserByName(payload.username);
+    const userHasRefreshTokenInDB = await this.refreshTokenService.findRefreshTokenByUserId(user._id)
+    console.log(user.email,userHasRefreshTokenInDB!=null)
+    if (!user || !userHasRefreshTokenInDB) {
       throw new UnauthorizedException();
     }
     return user;
   }
 
   async verifyToken(token: string): Promise<boolean> {
+    console.log('refresh token verification function called')
     try {
       const decodedToken = this.jwtService.verify(token, {
         secret: process.env.REFRESH_TOKEN_SECRET,

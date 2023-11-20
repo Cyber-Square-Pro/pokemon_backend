@@ -7,7 +7,7 @@ import { JwtStrategy } from './jwt.strategy';
 import { UserSchema } from '../users/user.model';
 import { UsersModule } from '../users/users.module';
 import { MongooseModule } from '@nestjs/mongoose';
-import { UserService } from '../users/users.services';
+import { UserService } from '../users/users.service';
 import { ConfigService } from '@nestjs/config';
 import { RefreshTokenSchema } from '../refresh.token/refresh-token.model';
 import { RefreshTokenService } from '../refresh.token/refresh-token.service';

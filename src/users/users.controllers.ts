@@ -8,10 +8,12 @@ import {
   Param,
   Patch,
   Post,
+  UseGuards,
 } from '@nestjs/common';
-import { UserService } from './users.services';
+import { UserService } from './users.service';
 import { EmailVerificationService } from 'src/email.verification/email.verification.service';
 import { OtpService } from 'src/otp/otp.service';
+import { AuthGuard } from '@nestjs/passport';
 
 @Controller('users')
 export class UsersController {
@@ -29,8 +31,8 @@ export class UsersController {
   }
   // Get one user by email
   @Post()
-  async getUserByEmail(@Body('email') email: string) {
-    const result = await this.usersService.findUserByEmail(email);
+  async getUserByName(@Body('username') username: string) {
+    const result = await this.usersService.findUserByName(username);
     return result;
   }
   @Get()
@@ -40,34 +42,35 @@ export class UsersController {
   }
 
   // Create one user
-  @Post('sign-up')
-  async createUser(
-    @Body()
-    body: {
-      name: string;
-      email: string;
-      phone_number: number;
-      password: string;
-    },
-  ) {
-      const result = await this.usersService.createUser(
-        body.name,
-        body.email,
-        body.phone_number,
-        body.password,
-      );
-    if (result) return {message:'Created user succesfully'};
-    else throw new InternalServerErrorException('Failed to create user')
-    
-  }
+  // @Post('sign-up')
+  // async registerUser(
+  //   @Body()
+  //   body: {
+  //     name: string;
+  //     email: string;
+  //     phone_number: number;
+  //     password: string;
+  //   },
+  // ) {
+  //     const result = await this.usersService.createUser(
+  //       body.name,
+  //       body.email,
+  //       body.phone_number,
+  //       body.password,
+  //     );
+  //   if (result) return {message:'Created user succesfully'};
+  //   else throw new InternalServerErrorException('Failed to create user')
+
+  // }
 
   //Update User
   @Patch(':id')
+  @UseGuards(AuthGuard('jwt'))
   updateUser(
     @Param('id') id: string,
     @Body()
     body: {
-      name: string;
+      username: string;
       email: string;
       phone_number: number;
       password: string;
@@ -75,12 +78,13 @@ export class UsersController {
   ) {
     const updatedUser = this.usersService.updateUserById(
       id,
-      body.name,
+      body.username,
       body.email,
       body.phone_number,
       body.password,
     );
-    return updatedUser;
+    if (updatedUser) return updatedUser;
+    else throw new InternalServerErrorException('Unable to update user');
   }
 
   // delete user by id
@@ -92,14 +96,16 @@ export class UsersController {
   @Post('send-verification-email')
   async sendVerificationEmail(@Body('email') email: string) {
     // Generating a random OTP and storing that + user's email
-    const generatedOTP =  this.otpService.generateOTP();
+    const generatedOTP = this.otpService.generateOTP();
     await this.otpService.storeOTP(email, generatedOTP);
     const res = await this.emailVerificationService.sendVerificationEmail(
       email,
       generatedOTP,
     );
     if (res)
-      return { message: `OTP has been sent to your mail-> OTP ${generatedOTP}` };
+      return {
+        message: `OTP has been sent to your mail-> OTP ${generatedOTP}`,
+      };
     else throw new InternalServerErrorException('Failed to send OTP');
   }
 
@@ -108,24 +114,27 @@ export class UsersController {
     @Body('email') email: string,
     @Body('otp') userEnteredOTP: number,
   ) {
-    try {
-      const storedOtp = await this.otpService.getStoredOTP(email);
+    const storedOtp = await this.otpService.getStoredOTP(email);
+    const validity = 2 * 60 * 1000;
+
+    // Calculate the difference between current time and OTP creation time
+    const currentTime = new Date();
+    const timeDifference =
+      currentTime.getTime() - storedOtp.createdAt.getTime();
+
+    if (timeDifference < validity) {
       const verifyResult = await this.emailVerificationService.verifyEmail(
-        storedOtp,
+        storedOtp.otp,
         userEnteredOTP,
       );
 
       if (verifyResult) {
-        return { message: 'Successfully Verified Email' };
+        return true;
       } else {
-        throw new BadRequestException('Failed to verify email: Invalid OTP');
+        throw new BadRequestException('Invalid OTP');
       }
-    } catch (error) {
-      // Log the error for server-side debugging
-      console.error('Error during email verification:', error);
-
-      // Return a generic error response
-      throw new InternalServerErrorException('Error during email verification\n ',error);
+    } else {
+      throw new BadRequestException('Invalid OTP');
     }
   }
 }
