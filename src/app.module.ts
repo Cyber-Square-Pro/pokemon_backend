@@ -18,8 +18,6 @@ import { RefreshTokenService } from './refresh.token/refresh-token.service';
 import { RefreshTokenSchema } from './refresh.token/refresh-token.model';
 import { PassportModule } from '@nestjs/passport';
 import { JwtStrategy } from './auth/jwt.strategy';
-import { ServiceController } from './module/service/service.controller';
-import { NewsController } from './news/news/news.controller';
 import { NewsController } from './news/news.controller';
 import { NewsService } from './news/news.service';
 import { NewsModule } from './news/news.module';
@@ -49,7 +47,7 @@ import { NewsModule } from './news/news.module';
     MailerModule,
     NewsModule,
   ],
-  controllers: [AppController, AuthController, ServiceController, NewsController],
+  controllers: [AppController, AuthController, NewsController],
   providers: [
     JwtStrategy,
     UserService,
