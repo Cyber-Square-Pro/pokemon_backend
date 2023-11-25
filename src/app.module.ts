@@ -18,6 +18,11 @@ import { RefreshTokenService } from './refresh.token/refresh-token.service';
 import { RefreshTokenSchema } from './refresh.token/refresh-token.model';
 import { PassportModule } from '@nestjs/passport';
 import { JwtStrategy } from './auth/jwt.strategy';
+import { ServiceController } from './module/service/service.controller';
+import { NewsController } from './news/news/news.controller';
+import { NewsController } from './news/news.controller';
+import { NewsService } from './news/news.service';
+import { NewsModule } from './news/news.module';
 
 @Module({
   imports: [
@@ -42,8 +47,9 @@ import { JwtStrategy } from './auth/jwt.strategy';
     EmailVerificationModule,
     OtpModule,
     MailerModule,
+    NewsModule,
   ],
-  controllers: [AppController, AuthController],
+  controllers: [AppController, AuthController, ServiceController, NewsController],
   providers: [
     JwtStrategy,
     UserService,
@@ -52,6 +58,7 @@ import { JwtStrategy } from './auth/jwt.strategy';
     MailerService,
     RefreshTokenService,
     AuthService,
+    NewsService,
   ],
 })
 export class AppModule {}

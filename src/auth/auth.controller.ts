@@ -46,7 +46,7 @@ export class AuthController {
       return result;
     } else {
       // return { message: 'Invalid refresh token.' };
-      throw new UnauthorizedException('You are unauthorized')
+      throw new UnauthorizedException('Could not to generate new access token!')
     }
   }
 
@@ -55,6 +55,7 @@ export class AuthController {
     await this.authService.logout(req.user);
   }
 
+  // To test a protected route with access token
   @Get('protected')
   @UseGuards(AuthGuard('jwt'))
   protected(@Request() req) {

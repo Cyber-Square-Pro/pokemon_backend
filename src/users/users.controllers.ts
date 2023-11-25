@@ -41,28 +41,6 @@ export class UsersController {
     return result;
   }
 
-  // Create one user
-  // @Post('sign-up')
-  // async registerUser(
-  //   @Body()
-  //   body: {
-  //     name: string;
-  //     email: string;
-  //     phone_number: number;
-  //     password: string;
-  //   },
-  // ) {
-  //     const result = await this.usersService.createUser(
-  //       body.name,
-  //       body.email,
-  //       body.phone_number,
-  //       body.password,
-  //     );
-  //   if (result) return {message:'Created user succesfully'};
-  //   else throw new InternalServerErrorException('Failed to create user')
-
-  // }
-
   //Update User
   @Patch(':id')
   @UseGuards(AuthGuard('jwt'))
@@ -95,7 +73,7 @@ export class UsersController {
 
   @Post('send-verification-email')
   async sendVerificationEmail(@Body('email') email: string) {
-    // Generating a random OTP and storing that + user's email
+    // Generating an OTP number and storing that + user's email
     const generatedOTP = this.otpService.generateOTP();
     await this.otpService.storeOTP(email, generatedOTP);
     const res = await this.emailVerificationService.sendVerificationEmail(
@@ -114,24 +92,30 @@ export class UsersController {
     @Body('email') email: string,
     @Body('otp') userEnteredOTP: number,
   ) {
+    const otpDuration = 2; // In Minutes
+
     const storedOtp = await this.otpService.getStoredOTP(email);
-    const validity = 2 * 60 * 1000;
+    if (storedOtp.otp != null) {
+      const validity = otpDuration * 60 * 1000;
 
-    // Calculate the difference between current time and OTP creation time
-    const currentTime = new Date();
-    const timeDifference =
-      currentTime.getTime() - storedOtp.createdAt.getTime();
+      // Calculating the difference between current time and OTP creation time
+      const currentTime = new Date();
+      const timeDifference =
+        currentTime.getTime() - storedOtp.createdAt.getTime();
 
-    if (timeDifference < validity) {
-      const verifyResult = await this.emailVerificationService.verifyEmail(
-        storedOtp.otp,
-        userEnteredOTP,
-      );
+      if (timeDifference < validity) {
+        const verifyResult = await this.emailVerificationService.verifyEmail(
+          storedOtp.otp,
+          userEnteredOTP,
+        );
 
-      if (verifyResult) {
-        return true;
+        if (verifyResult) {
+          return true;
+        } else {
+          throw new BadRequestException('Invalid OTP!');
+        }
       } else {
-        throw new BadRequestException('Invalid OTP');
+        throw new BadRequestException('OTP Expired!');
       }
     } else {
       throw new BadRequestException('Invalid OTP');

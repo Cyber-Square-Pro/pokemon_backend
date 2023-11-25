@@ -16,9 +16,14 @@ export class UserService {
     const user = await this.findOne(id);
     return user;
   }
-  // find one user by email
+  // find one user by username
   async findUserByName(name: string) {
     const user = await this.findOneByName(name);
+    return user;
+  }
+  // find one user by email
+  async findUserByEmail(email: string) {
+    const user = await this.findOneByEmail(email);
     return user;
   }
 
@@ -105,6 +110,18 @@ export class UserService {
     let user: User;
     try {
       user = await this.userModel.findOne({ name }).exec();
+    } catch (error) {
+      throw new NotFoundException('Could not find this user');
+    }
+    if (!user) {
+      throw new NotFoundException('Could not find this user');
+    }
+    return user;
+  }
+  private async findOneByEmail(email: string): Promise<User> {
+    let user: User;
+    try {
+      user = await this.userModel.findOne({ email }).exec();
     } catch (error) {
       throw new NotFoundException('Could not find this user');
     }

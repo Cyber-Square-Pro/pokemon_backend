@@ -1,12 +1,15 @@
 // auth.service.ts
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UserService } from '../users/users.service';
 import * as bcrypt from 'bcrypt';
 import { User } from '../users/user.model';
 import { RefreshTokenService } from 'src/refresh.token/refresh-token.service';
 import { JwtStrategy } from './jwt.strategy';
-
 
 @Injectable()
 export class AuthService {
@@ -34,12 +37,16 @@ export class AuthService {
 
     if (user && (await this.comparePasswords(password, user.password))) {
       // Generate access token
-      const accessToken = this.generateAccessToken({ username: user.name });
+      const accessToken = this.generateAccessToken({
+        userId: user.id,
+        username: user.name,
+        email: user.email,
+      });
 
       // Generate refresh token
       const refreshToken = await this.generateRefreshToken(user);
 
-      return {accessToken, refreshToken };
+      return { accessToken, refreshToken };
     }
 
     throw new NotFoundException('Invalid Credentials');
@@ -48,33 +55,56 @@ export class AuthService {
   private generateAccessToken(payload: any): string {
     return this.jwtService.sign(payload, {
       secret: process.env.ACCESS_TOKEN_SECRET,
-      expiresIn: '5m',
+      expiresIn: '3m',
     });
   }
 
   private async generateRefreshToken(user: User): Promise<string> {
     const token = this.jwtService.sign(
-      { email: user.email },
+      { username: user.name, email: user.email },
+
       {
         secret: process.env.REFRESH_TOKEN_SECRET,
         expiresIn: '7d',
       },
     );
-  
-    // Create a new RefreshToken document
-    await this.refreshTokenService.createRefreshToken(token,user._id);
-  
+
+    /* Create a new RefreshToken document if a refresh token 
+    doesnt already exist against this user or if the token has expired */
+    const existingTokenResult =
+      await this.refreshTokenService.findRefreshTokenByUserId(user._id);
+
+      if (existingTokenResult) {
+        try {
+          await this.jwtService.verify(existingTokenResult.token, {
+            secret: process.env.REFRESH_TOKEN_SECRET,
+          });
+          console.log('A valid refresh token for this user already exists in DB')
+        return existingTokenResult.token;
+       } catch (error) {
+        throw new InternalServerErrorException('Error during token generation')
+       }
+      }
+      // If a valid token still exists in the DB use that instead
+    await this.refreshTokenService.createRefreshToken(token, user);
+
     return token;
   }
 
   // Re-generating acccess token
-  async refreshAccessToken(refreshToken: string): Promise<{ accessToken: string } | null> {
+  async refreshAccessToken(
+    refreshToken: string,
+  ): Promise<{ accessToken: string } | null> {
     // Verify the refresh token
-    const isValidRefreshToken = await this.jwtStrategy.verifyToken(refreshToken);
+    const isValidRefreshToken =
+      await this.jwtStrategy.verifyToken(refreshToken);
 
     if (isValidRefreshToken) {
+      console.log('Token is valid');
       // Extract user email from the refresh token
-      const decodedToken = this.jwtService.decode(refreshToken) as { username: string };
+      const decodedToken = this.jwtService.decode(refreshToken) as {
+        username: string;
+      };
       const username = decodedToken.username;
 
       // Generate a new access token
@@ -84,18 +114,15 @@ export class AuthService {
 
     return null;
   }
-  
 
   private async comparePasswords(
     enteredPassword: string,
     storedPassword: string,
   ): Promise<boolean> {
-    return await bcrypt.compare(enteredPassword, storedPassword)
+    return await bcrypt.compare(enteredPassword, storedPassword);
   }
-
 
   async logout(user: User): Promise<void> {
     await this.refreshTokenService.deleteRefreshToken(user._id);
   }
-  
 }

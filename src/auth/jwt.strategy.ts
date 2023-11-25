@@ -21,9 +21,8 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   }
 
   async validate(payload: JwtPayload) {
-    const user = await this.userService.findUserByName(payload.username);
+    const user = await this.userService.findUserByEmail(payload.email);
     const userHasRefreshTokenInDB = await this.refreshTokenService.findRefreshTokenByUserId(user._id)
-    console.log(user.email,userHasRefreshTokenInDB!=null)
     if (!user || !userHasRefreshTokenInDB) {
       throw new UnauthorizedException();
     }
@@ -36,10 +35,13 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       const decodedToken = this.jwtService.verify(token, {
         secret: process.env.REFRESH_TOKEN_SECRET,
       });
+      console.log(decodedToken)
       const refreshToken =
         await this.refreshTokenService.findRefreshToken(token);
-      return !!refreshToken && decodedToken.email == refreshToken.user
+        if(refreshToken) console.log('Token Found in DB,')
+      return !!refreshToken && decodedToken.email == refreshToken.email
     } catch (error) {
+      console.log('Error in verifyToken()')
       return false;
     }
   }
