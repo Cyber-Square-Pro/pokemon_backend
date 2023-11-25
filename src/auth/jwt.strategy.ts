@@ -21,7 +21,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   }
 
   async validate(payload: JwtPayload) {
-    const user = await this.userService.findUserByEmail(payload.email);
+    const user = await this.userService.findUserByName(payload.username);
     const userHasRefreshTokenInDB = await this.refreshTokenService.findRefreshTokenByUserId(user._id)
     if (!user || !userHasRefreshTokenInDB) {
       throw new UnauthorizedException();
@@ -30,12 +30,11 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   }
 
   async verifyToken(token: string): Promise<boolean> {
-    console.log('refresh token verification function called')
     try {
       const decodedToken = this.jwtService.verify(token, {
         secret: process.env.REFRESH_TOKEN_SECRET,
       });
-      console.log(decodedToken)
+      console.log('decoded token',decodedToken)
       const refreshToken =
         await this.refreshTokenService.findRefreshToken(token);
         if(refreshToken) console.log('Token Found in DB,')

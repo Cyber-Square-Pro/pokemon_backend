@@ -21,21 +21,23 @@ import { JwtStrategy } from './auth/jwt.strategy';
 import { NewsController } from './news/news.controller';
 import { NewsService } from './news/news.service';
 import { NewsModule } from './news/news.module';
+import { NewsSchema } from './news/news.model';
 
 @Module({
   imports: [
     PassportModule.register({ defaultStrategy: 'jwt' }),
 
     JwtModule.register({
-      secret:process.env.ACCESS_TOKEN_SECRET,
-      signOptions:{
-        algorithm:'HS256',
-        expiresIn:'2m'
-      }
+      secret: process.env.ACCESS_TOKEN_SECRET,
+      signOptions: {
+        algorithm: 'HS256',
+        expiresIn: '2m',
+      },
     }),
     UsersModule,
 
     MongooseModule.forFeature([{ name: 'User', schema: UserSchema }]),
+    MongooseModule.forFeature([{ name: 'News', schema: NewsSchema }]),
     MongooseModule.forFeature([
       { name: 'RefreshToken', schema: RefreshTokenSchema },
     ]),
