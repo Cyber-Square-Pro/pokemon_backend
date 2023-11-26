@@ -78,6 +78,7 @@ export class UserService {
       updatedUser.phone_number = phone_number;
     }
     if (password) {
+      password = await bcrypt.hash(password,3)
       updatedUser.password = password;
     }
 

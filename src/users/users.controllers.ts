@@ -40,6 +40,25 @@ export class UsersController {
     const result = this.usersService.findAllUsers();
     return result;
   }
+  @Patch('reset-password')
+  async resetPassword(
+    @Body('email') email: string,
+    @Body('password') password: string,
+  ) {
+    console.log('/users/reset-password called');
+    try {
+      const user = await this.usersService.findUserByEmail(email);
+      return await this.usersService.updateUserById(
+        user._id,
+        null,
+        null,
+        null,
+        password,
+      );
+    } catch (error) {
+      throw new InternalServerErrorException('Failed to reset password');
+    }
+  }
 
   //Update User
   @Patch(':id')
@@ -64,6 +83,7 @@ export class UsersController {
     if (updatedUser) return updatedUser;
     else throw new InternalServerErrorException('Unable to update user');
   }
+
 
   // delete user by id
   @Delete(':id')
@@ -92,9 +112,10 @@ export class UsersController {
     @Body('email') email: string,
     @Body('otp') userEnteredOTP: number,
   ) {
-    const otpDuration = 2; // In Minutes
+    const otpDuration = 3; // In Minutes
 
     const storedOtp = await this.otpService.getStoredOTP(email);
+    console.log('stored OTP: ',storedOtp.otp);
     if (storedOtp.otp != null) {
       const validity = otpDuration * 60 * 1000;
 
@@ -104,6 +125,7 @@ export class UsersController {
         currentTime.getTime() - storedOtp.createdAt.getTime();
 
       if (timeDifference < validity) {
+        console.log('OTP Still valid')
         const verifyResult = await this.emailVerificationService.verifyEmail(
           storedOtp.otp,
           userEnteredOTP,
@@ -112,13 +134,15 @@ export class UsersController {
         if (verifyResult) {
           return true;
         } else {
-          throw new BadRequestException('Invalid OTP!');
+          throw new BadRequestException('Invalid OTP');
         }
       } else {
-        throw new BadRequestException('OTP Expired!');
+        throw new BadRequestException('OTP Expired');
       }
     } else {
       throw new BadRequestException('Invalid OTP');
     }
   }
+
+
 }

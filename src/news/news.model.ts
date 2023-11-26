@@ -3,8 +3,7 @@ import mongoose from 'mongoose';
 export const NewsSchema = new mongoose.Schema({
   newsId:{
     type:Number,
-    required:true,
-    default: (Math.random()*100)
+    default: Math.round((Math.random()/100))
   },
   author:{
     type:String,
@@ -20,7 +19,7 @@ export const NewsSchema = new mongoose.Schema({
   },
   date: {
     type: Date,
-    required: true,
+    unique:false,
     default: Date.now(),
   },
 });

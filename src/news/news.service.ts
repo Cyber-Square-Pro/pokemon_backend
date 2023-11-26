@@ -30,12 +30,9 @@ export class NewsService {
     author: string,
     content: string,
   ): Promise<boolean> {
-    try {
-      await this.newsModel.create({ title, author, content });
-      return true;
-    } catch (err) {
-      throw new InternalServerErrorException();
-    }
+      const createdDoc =  this.newsModel.create({ title, author, content });
+      if(createdDoc) return true;
+      else return false;
   }
 
   async postManyArticles(
