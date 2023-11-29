@@ -22,6 +22,11 @@ import { NewsController } from './news/news.controller';
 import { NewsService } from './news/news.service';
 import { NewsModule } from './news/news.module';
 import { NewsSchema } from './news/news.model';
+import { FavouritesModule } from './favourites/favourites.module';
+import { FavouritesSchema } from './favourites/favourite.model';
+import { FavouritesController } from './favourites/favourites.controller';
+import { PokemonSchema } from './pokemon/pokemon.model';
+import { PokemonService } from './pokemon/pokemon.services';
 
 @Module({
   imports: [
@@ -37,6 +42,8 @@ import { NewsSchema } from './news/news.model';
     UsersModule,
 
     MongooseModule.forFeature([{ name: 'User', schema: UserSchema }]),
+    MongooseModule.forFeature([{ name: 'Pokemon', schema: PokemonSchema }]),
+    MongooseModule.forFeature([{ name: 'Favourite', schema: FavouritesSchema }]),
     MongooseModule.forFeature([{ name: 'News', schema: NewsSchema }]),
     MongooseModule.forFeature([
       { name: 'RefreshToken', schema: RefreshTokenSchema },
@@ -48,8 +55,9 @@ import { NewsSchema } from './news/news.model';
     OtpModule,
     MailerModule,
     NewsModule,
+    FavouritesModule,
   ],
-  controllers: [AppController, AuthController, NewsController],
+  controllers: [AppController, AuthController, NewsController,FavouritesController],
   providers: [
     JwtStrategy,
     UserService,
@@ -59,6 +67,7 @@ import { NewsSchema } from './news/news.model';
     RefreshTokenService,
     AuthService,
     NewsService,
+    PokemonService,
   ],
 })
 export class AppModule {}

@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Injectable,
   InternalServerErrorException,
   NotFoundException,
@@ -14,25 +15,37 @@ export class FavouritesService {
     @InjectModel('Favourite') readonly favouritesModel: Model<Favourite>,
   ) {}
 
-  async getFavourites(user: User): Promise<any> {
+  async getFavourites(user: User): Promise<string[]> {
     const favourites = await this.favouritesModel
-      .find({ user: user._id })
+      .findOne({ user: user._id })
       .exec();
     console.log(favourites);
-    if (favourites) return favourites;
+    if (favourites) return favourites.pokemon;
     else return null;
   }
-  async saveFavourites(user: User, favourites: string[]) {
+  async saveFavourite(user: User, favourite: string) {
     const doc = await this.favouritesModel.findOne({ user: user._id }).exec();
     if (doc) {
-      doc.pokemon = favourites;
+      if (doc.pokemon.includes(favourite)) {
+        throw new BadRequestException(
+          'This item already exists in favourites list',
+        );
+      }
+      console.log(favourite)
+      doc.pokemon.push(favourite)
+      return doc.save();
     } else {
       const doc = await this.favouritesModel.create({
         user: user._id,
-        pokemon: favourites,
+        pokemon: [favourite],
       });
-      return doc;
+      return doc.save();
     }
-    return doc.save();
+  }
+
+  async containsFavourite(user: User, fav: string): Promise<boolean> {
+    const favourites = await this.favouritesModel.findOne({ user: user._id });
+    if (!favourites) return false;
+    else return favourites.pokemon.includes(fav);
   }
 }

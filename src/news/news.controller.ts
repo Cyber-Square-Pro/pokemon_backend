@@ -8,7 +8,7 @@ export class NewsController {
 
   @Get()
   @UseGuards(AuthGuard('jwt'))
-  async getAllNews(@Query('page') page: number = 1, @Query('pageSize') pageSize: number = 5) {
+  async getAllNews(@Query('page') page: number = 1, @Query('pageSize') pageSize: number = 10) {
     return await this.newsService.getAllArticles(page, pageSize);
   }
 

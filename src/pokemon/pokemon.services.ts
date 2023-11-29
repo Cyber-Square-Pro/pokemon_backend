@@ -8,27 +8,30 @@ export class PokemonService {
   constructor(@InjectModel('Pokemon') readonly pokemonModel: Model<Pokemon>) {}
 
   // Fetching one pokemon
-  async getOnePokemon(id: string):Promise<Pokemon> {
-    const foundPokemon = await this.findPokemonByID(id)
-    return foundPokemon
+  async getOnePokemon(id: string): Promise<Pokemon> {
+    const foundPokemon = await this.findPokemonByID(id);
+    return foundPokemon;
   }
 
   // Returning a list of all pokemons
-  async getAllpokemon():Promise<Pokemon[]> {
-    return await this.pokemonModel.find()
+  async getAllpokemon(): Promise<Pokemon[]> {
+    return await this.pokemonModel.find();
   }
- 
-  
+
+  async getListOfPokemonByIds(ids: string[]): Promise<Pokemon[]> {
+    return await this.pokemonModel.find({ number: ids });
+  }
+
   private async findPokemonByID(id: string): Promise<Pokemon> {
-    let pokemon:Pokemon
+    let pokemon: Pokemon;
     try {
-      pokemon = await this.pokemonModel.findById(id)
+      pokemon = await this.pokemonModel.findById(id);
     } catch (error) {
-      throw new NotFoundException('Could not find this pokemon')
+      throw new NotFoundException('Could not find this pokemon');
     }
-    if(!pokemon){
-      throw new NotFoundException('Could not find this pokemon')
+    if (!pokemon) {
+      throw new NotFoundException('Could not find this pokemon');
     }
-    return pokemon
+    return pokemon;
   }
 }

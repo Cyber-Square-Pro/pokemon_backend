@@ -7,11 +7,11 @@ import { InjectModel } from '@nestjs/mongoose';
 export class NewsService {
   constructor(@InjectModel('News') readonly newsModel: Model<News>) {}
 
-  async getAllArticles(page: number = 1, pageSize: number = 5): Promise<News[]> {
+  async getAllArticles(page: number = 1, pageSize: number = 10): Promise<News[]> {
     try {
       const skip = (page - 1) * pageSize;
       const news = await this.newsModel.find().skip(skip).limit(pageSize).exec();
-      return news;
+     return news;
     } catch (error) {
       throw new InternalServerErrorException(error);
     }
