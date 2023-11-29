@@ -45,9 +45,10 @@ export class UsersController {
     @Body('email') email: string,
     @Body('password') password: string,
   ) {
-    console.log('/users/reset-password called');
+    // console.log('/users/reset-password called');
     try {
       const user = await this.usersService.findUserByEmail(email);
+      // console.log(user)
       return await this.usersService.updateUserById(
         user._id,
         null,
@@ -56,7 +57,7 @@ export class UsersController {
         password,
       );
     } catch (error) {
-      throw new InternalServerErrorException('Failed to reset password');
+      throw new InternalServerErrorException('Failed to reset password',error);
     }
   }
 
