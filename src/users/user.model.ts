@@ -11,6 +11,6 @@ export interface User extends mongoose.Document {
   id: number;
   name: string;
   email: string;
-  phone_number: number;
+  phone_number: number
   password: string;
 }

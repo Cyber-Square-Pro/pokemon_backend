@@ -1,4 +1,4 @@
-import { Body, Controller, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Patch, Post, Put, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { FavouritesService } from './favourites.service';
 import { UserService } from 'src/users/users.service';
@@ -25,10 +25,11 @@ export class FavouritesController {
     }
   }
 
-  @Post('add')
+  @Patch('add')
   @UseGuards(AuthGuard('jwt'))
   async saveFavourite(@Body() body: { username: string; favourite: string }) {
     const user = await this.usersService.findUserByName(body.username);
+    console.log('user trying to add favourite: ', user.name);
     return this.favouritesService.saveFavourite(user, body.favourite);
   }
 
@@ -36,5 +37,15 @@ export class FavouritesController {
   @UseGuards(AuthGuard('jwt'))
   async containsFavourite(
     @Body() body: { username: string; favourite: string },
-  ) {}
+  ) {
+    const user = await this.usersService.findUserByName(body.username);
+    return await this.favouritesService.containsFavourite(user,body.favourite);
+  }
+
+  @Delete('remove')
+  @UseGuards(AuthGuard('jwt'))
+  async removeFavourite(@Body() body: { username: string; favourite: string }) {
+    const user = await this.usersService.findUserByName(body.username);
+    return await this.favouritesService.removeFavourite(user, body.favourite);
+  }
 }

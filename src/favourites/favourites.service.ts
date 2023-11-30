@@ -26,13 +26,14 @@ export class FavouritesService {
   async saveFavourite(user: User, favourite: string) {
     const doc = await this.favouritesModel.findOne({ user: user._id }).exec();
     if (doc) {
+      console.log(doc);
       if (doc.pokemon.includes(favourite)) {
         throw new BadRequestException(
           'This item already exists in favourites list',
         );
       }
-      console.log(favourite)
-      doc.pokemon.push(favourite)
+      console.log(favourite);
+      doc.pokemon.push(favourite);
       return doc.save();
     } else {
       const doc = await this.favouritesModel.create({
@@ -47,5 +48,15 @@ export class FavouritesService {
     const favourites = await this.favouritesModel.findOne({ user: user._id });
     if (!favourites) return false;
     else return favourites.pokemon.includes(fav);
+  }
+
+  async removeFavourite(user: User, fav: string) {
+    try {
+      let favourite = await this.favouritesModel.findOne({ user: user._id });
+      favourite.pokemon = favourite.pokemon.filter((item) => item != fav);
+      await favourite.save();
+    } catch (error) {
+      throw new InternalServerErrorException(error);
+    }
   }
 }
