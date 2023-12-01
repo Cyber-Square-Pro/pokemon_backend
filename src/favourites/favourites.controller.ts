@@ -24,7 +24,6 @@ export class FavouritesController {
       return await this.pokemonService.getListOfPokemonByIds(favourites);
     }
   }
-
   @Patch('add')
   @UseGuards(AuthGuard('jwt'))
   async saveFavourite(@Body() body: { username: string; favourite: string }) {
