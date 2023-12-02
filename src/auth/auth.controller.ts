@@ -8,6 +8,7 @@ import {
   Request,
   Delete,
   UnauthorizedException,
+  Put,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { User } from '../users/user.model';
@@ -17,7 +18,7 @@ import { AuthGuard } from '@nestjs/passport';
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
-  @Post('register')
+  @Put('register')
   async register(
     @Body('username') username: string,
     @Body('email') email: string,

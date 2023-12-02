@@ -14,7 +14,7 @@ export class RefreshToken extends Document {
   @Prop({ type: 'String',  required: true, })
   email: string;
   
-  @Prop({ default: Date.now})
+  @Prop({ default: Date.now, expires: 60*60*24*7})
   createdAt: Date;
   
 }

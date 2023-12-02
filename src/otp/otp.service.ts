@@ -1,4 +1,4 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import { BadRequestException, Injectable, InternalServerErrorException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Otp } from './otp.model';
@@ -24,6 +24,10 @@ export class OtpService {
 
   async getStoredOTP(email: string): Promise<Otp> {
     const storedOTP = await this.otpModel.findOne({ email }).sort({'createdAt':-1}).exec();
+    if(storedOTP==null) throw new BadRequestException('OTP Expired')
     return storedOTP;
+  }
+  async compareOTP(otp: number, userEnteredOTP: number): Promise<boolean> {
+    return otp == userEnteredOTP;
   }
 }

@@ -1,7 +1,4 @@
-import {
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { User } from './user.model';
@@ -27,7 +24,12 @@ export class UserService {
     return user;
   }
 
-  // find all users
+  async phoneNumberExists(phone: number) {
+    const user = await this.findOneByPhone(phone);
+    return user;
+  }
+
+  // Get all user records
   async findAllUsers() {
     const result = await this.userModel.find();
     return result.map((user) => ({
@@ -47,12 +49,12 @@ export class UserService {
     password: string,
   ) {
     let hashedPass = await bcrypt.hash(password, 3);
-    // console.log(hashedPass)
+
     const newUser = new this.userModel({
       name,
       email,
       phone_number,
-      password:hashedPass,
+      password: hashedPass,
     });
     const result = await newUser.save();
     return result;
@@ -78,11 +80,18 @@ export class UserService {
       updatedUser.phone_number = phone_number;
     }
     if (password) {
-      password = await bcrypt.hash(password,3)
+      password = await bcrypt.hash(password, 3);
       updatedUser.password = password;
     }
 
     return updatedUser.save();
+  }
+
+  //Verifying user email
+  async setEmailToVerified(email:string){
+    const user = await this.userModel.findOne({email:email}).exec()
+    user.verified_email = true;
+    return user.save()
   }
 
   // Deleting a user from the db
@@ -93,7 +102,18 @@ export class UserService {
     else return false;
   }
 
-  // Helper method to find one user from mongo db
+  // Methods to check if any user has taken any of the three credentials
+  async isUsernameTaken(username: string) {
+    return await this.userModel.findOne({ name: username }).exec();
+  }
+  async isEmailTaken(email: string) {
+    return await this.userModel.findOne({ email: email }).exec();
+  }
+  async isPhoneNumberTaken(phone: number) {
+    return await this.userModel.findOne({ phone_number: phone }).exec();
+  }
+
+  // Methods to get one user record from the db
   private async findOne(id: string): Promise<User> {
     let user: User;
     try {
@@ -123,6 +143,18 @@ export class UserService {
     let user: User;
     try {
       user = await this.userModel.findOne({ email }).exec();
+    } catch (error) {
+      throw new NotFoundException('Could not find this user');
+    }
+    if (!user) {
+      throw new NotFoundException('Could not find this user');
+    }
+    return user;
+  }
+  private async findOneByPhone(phone: number): Promise<User> {
+    let user: User;
+    try {
+      user = await this.userModel.findOne({ phone_number: phone }).exec();
     } catch (error) {
       throw new NotFoundException('Could not find this user');
     }

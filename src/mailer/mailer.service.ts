@@ -1,13 +1,7 @@
-import { Injectable } from '@nestjs/common'
-import * as nodemailer from 'nodemailer'
+import { Injectable } from '@nestjs/common';
+import * as nodemailer from 'nodemailer';
 @Injectable()
 export class MailerService {
-  constructor(){}
-  // private envUser: string = process.env.USER;
-  // private envPass: string = process.env.PASS;
-  // private transporter
-
-  
   //constructor(){
   //   this.transporter = nodemailer.createTransport({
   //     host:'live.smtp.mailtrap.io',
@@ -19,7 +13,7 @@ export class MailerService {
   //   })
   // }
   //}
-  
+
   // async sendVerificationEmail(email: string, otp: number) {
   //   const mailOptions = {
   //     from: 'pokemon.team.b@gmail.com',
@@ -27,7 +21,7 @@ export class MailerService {
   //     subject: 'Email Verification for Pokemon App',
   //     text: `Your verification OTP Number is as follows: ${otp} \n`,
   //   };
-  
+
   //   try {
   //     const result = await this.transporter.sendMail(mailOptions);
   //     console.log('Email sent:', result);
@@ -38,9 +32,10 @@ export class MailerService {
   //   }
   // }
 
-  async sendVerificationEmail(email:string, otp:number){
-    return true
+  async sendResetEmail(email: string, otp: number) {
+    return true;
   }
-
-  
+  async sendVerificationEmail(email: string, otp: number) {
+    return true;
+  }
 }

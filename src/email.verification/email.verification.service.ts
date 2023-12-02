@@ -1,17 +1,20 @@
-import { Injectable } from '@nestjs/common'
-import {MailerService } from '../mailer/mailer.service'
+import { Injectable } from '@nestjs/common';
+import { MailerService } from '../mailer/mailer.service';
+
 @Injectable()
 export class EmailVerificationService {
-    constructor(private readonly mailerService: MailerService) {}
+  constructor(private readonly mailService: MailerService) {}
 
-    async sendVerificationEmail(email: string, otp: number):Promise<boolean> {
-     const res =  await this.mailerService.sendVerificationEmail(email,otp);
-      if(res) return true
-      else return false
-
+  async sendOtpEmail(
+    email: string,
+    otp: number,
+    intent: string,
+  ): Promise<boolean> {
+    console.log(intent)
+    if (intent == 'SIGN_UP') {
+      return await this.mailService.sendVerificationEmail(email, otp);
+    } else if (intent == 'RESET_PASS') {
+      return await this.mailService.sendResetEmail(email, otp);
     }
-  
-    async verifyEmail(otp: number, userEnteredOTP: number): Promise<boolean> {
-      return  otp == userEnteredOTP;
-    }
+  }
 }

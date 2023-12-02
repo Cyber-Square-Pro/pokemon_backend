@@ -2,10 +2,9 @@ import {
   BadRequestException,
   Body,
   Controller,
-  Delete,
   Get,
   InternalServerErrorException,
-  Param,
+  NotFoundException,
   Patch,
   Post,
   UseGuards,
@@ -45,10 +44,8 @@ export class UsersController {
     @Body('email') email: string,
     @Body('password') password: string,
   ) {
-    // console.log('/users/reset-password called');
     try {
       const user = await this.usersService.findUserByEmail(email);
-      // console.log(user)
       return await this.usersService.updateUserById(
         user._id,
         null,
@@ -57,17 +54,17 @@ export class UsersController {
         password,
       );
     } catch (error) {
-      throw new InternalServerErrorException('Failed to reset password',error);
+      throw new InternalServerErrorException('Failed to reset password', error);
     }
   }
 
   //Update User
-  @Patch(':id')
+  @Patch()
   @UseGuards(AuthGuard('jwt'))
   updateUser(
-    @Param('id') id: string,
     @Body()
     body: {
+      id: string;
       username: string;
       email: string;
       phone_number: number;
@@ -75,7 +72,7 @@ export class UsersController {
     },
   ) {
     const updatedUser = this.usersService.updateUserById(
-      id,
+      body.id,
       body.username,
       body.email,
       body.phone_number,
@@ -85,22 +82,20 @@ export class UsersController {
     else throw new InternalServerErrorException('Unable to update user');
   }
 
+  @Post('send-otp')
+  async sendOtpEmail(
+    @Body('email') email: string,
+    @Body('intent') intent: string,
+  ) {
 
-  // delete user by id
-  @Delete(':id')
-  deleteUser(@Param('id') id: string) {
-    return this.usersService.deleteUserById(id);
-  }
-
-  @Post('send-verification-email')
-  async sendVerificationEmail(@Body('email') email: string) {
-    // Generating an OTP number and storing that + user's email
     const generatedOTP = this.otpService.generateOTP();
     await this.otpService.storeOTP(email, generatedOTP);
-    const res = await this.emailVerificationService.sendVerificationEmail(
+    const res = await this.emailVerificationService.sendOtpEmail(
       email,
       generatedOTP,
+      intent,
     );
+    console.log(res)
     if (res)
       return {
         message: `OTP has been sent to your mail-> OTP ${generatedOTP}`,
@@ -112,38 +107,26 @@ export class UsersController {
   async verifyEmail(
     @Body('email') email: string,
     @Body('otp') userEnteredOTP: number,
+    @Body('intent') intent: string,
   ) {
-    const otpDuration = 3; // In Minutes
-
     const storedOtp = await this.otpService.getStoredOTP(email);
-    console.log('stored OTP: ',storedOtp.otp);
-    if (storedOtp.otp != null) {
-      const validity = otpDuration * 60 * 1000;
 
-      // Calculating the difference between current time and OTP creation time
-      const currentTime = new Date();
-      const timeDifference =
-        currentTime.getTime() - storedOtp.createdAt.getTime();
-
-      if (timeDifference < validity) {
-        console.log('OTP Still valid')
-        const verifyResult = await this.emailVerificationService.verifyEmail(
-          storedOtp.otp,
-          userEnteredOTP,
-        );
-
-        if (verifyResult) {
-          return true;
-        } else {
-          throw new BadRequestException('Invalid OTP');
+    const verifyResult = await this.otpService.compareOTP(
+      storedOtp.otp,
+      userEnteredOTP,
+    );
+    if (verifyResult) {
+      if (intent == 'SIGN_UP') {
+        try {
+          await this.usersService.setEmailToVerified(email);
+          return { message: 'Verified email succesfully' };
+        } catch (error) {
+          throw new InternalServerErrorException('Unexpected error occured');
         }
-      } else {
-        throw new BadRequestException('OTP Expired');
       }
+      return { message: 'Email confirmed' };
     } else {
       throw new BadRequestException('Invalid OTP');
     }
   }
-
-
 }
