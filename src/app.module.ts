@@ -48,7 +48,7 @@ import { PokemonService } from './pokemon/pokemon.services';
     MongooseModule.forFeature([
       { name: 'RefreshToken', schema: RefreshTokenSchema },
     ]),
-    MongooseModule.forRoot('mongodb://localhost:27017/pokemon_db'),
+    MongooseModule.forRoot(process.env.MONGO_URI),
     AuthModule,
     PokemonModule,
     EmailVerificationModule,
