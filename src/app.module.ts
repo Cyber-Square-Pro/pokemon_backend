@@ -27,6 +27,7 @@ import { FavouritesSchema } from './favourites/favourite.model';
 import { FavouritesController } from './favourites/favourites.controller';
 import { PokemonSchema } from './pokemon/pokemon.model';
 import { PokemonService } from './pokemon/pokemon.services';
+import { mongooseConfig } from 'src/mongoose.config';
 
 @Module({
   imports: [
@@ -48,7 +49,12 @@ import { PokemonService } from './pokemon/pokemon.services';
     MongooseModule.forFeature([
       { name: 'RefreshToken', schema: RefreshTokenSchema },
     ]),
-    MongooseModule.forRoot(process.env.MONGO_URI),
+  MongooseModule.forRootAsync(
+    {
+      useFactory:()=>mongooseConfig,
+      
+    }
+  ),
     AuthModule,
     PokemonModule,
     EmailVerificationModule,
