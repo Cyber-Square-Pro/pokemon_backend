@@ -2,7 +2,7 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import * as dotenv from 'dotenv';
 import { mongooseConfig } from './mongoose.config';
-
+import mongoose from 'mongoose';
 async function bootstrap() {
   dotenv.config();
   const PORT = process.env.PORT || 3000;
@@ -14,11 +14,9 @@ async function bootstrap() {
 }
 
 async function mongooseConnect() {
-  const mongoose = require('mongoose');
-
   try {
     // Connect to MongoDB
-    await mongoose.connect(process.env.MONGO_URI, mongooseConfig);
+    await mongoose.connect(process.env.MONGO_URI);
 
     console.log('MongoDB connected successfully');
   } catch (error) {
