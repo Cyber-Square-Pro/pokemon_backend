@@ -24,7 +24,7 @@ export class UserService {
     return user;
   }
 
-  async phoneNumberExists(phone: number) {
+  async phoneNumberExists(phone: string) {
     const user = await this.findOneByPhone(phone);
     return user;
   }
@@ -45,7 +45,7 @@ export class UserService {
   async createUser(
     name: string,
     email: string,
-    phone_number: number,
+    phone_number: string,
     password: string,
   ) {
     let hashedPass = await bcrypt.hash(password, 3);
@@ -65,7 +65,7 @@ export class UserService {
     id: string,
     name: string,
     email: string,
-    phone_number: number,
+    phone_number: string,
     password: string,
   ) {
     const updatedUser = await this.findOne(id);
@@ -109,7 +109,7 @@ export class UserService {
   async isEmailTaken(email: string) {
     return await this.userModel.findOne({ email: email }).exec();
   }
-  async isPhoneNumberTaken(phone: number) {
+  async isPhoneNumberTaken(phone: string) {
     return await this.userModel.findOne({ phone_number: phone }).exec();
   }
 
@@ -151,7 +151,7 @@ export class UserService {
     }
     return user;
   }
-  private async findOneByPhone(phone: number): Promise<User> {
+  private async findOneByPhone(phone: string): Promise<User> {
     let user: User;
     try {
       user = await this.userModel.findOne({ phone_number: phone }).exec();

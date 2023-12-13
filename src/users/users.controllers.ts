@@ -67,7 +67,7 @@ export class UsersController {
       id: string;
       username: string;
       email: string;
-      phone_number: number;
+      phone_number: string;
       password: string;
     },
   ) {

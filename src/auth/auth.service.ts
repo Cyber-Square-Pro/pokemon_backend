@@ -24,7 +24,7 @@ export class AuthService {
   async register(
     username: string,
     email: string,
-    phone: number,
+    phone: string,
     password: string,
   ): Promise<User> {
     const usernameExists = await this.userService.isUsernameTaken(username);

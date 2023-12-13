@@ -22,7 +22,7 @@ export class AuthController {
   async register(
     @Body('username') username: string,
     @Body('email') email: string,
-    @Body('phone_number') phone: number,
+    @Body('phone_number') phone: string,
     @Body('password') password: string,
   ): Promise<User> {
     console.log('/register endpoint called')
