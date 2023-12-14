@@ -44,17 +44,16 @@ import { mongooseConfig } from 'src/mongoose.config';
 
     MongooseModule.forFeature([{ name: 'User', schema: UserSchema }]),
     MongooseModule.forFeature([{ name: 'Pokemon', schema: PokemonSchema }]),
-    MongooseModule.forFeature([{ name: 'Favourite', schema: FavouritesSchema }]),
+    MongooseModule.forFeature([
+      { name: 'Favourite', schema: FavouritesSchema },
+    ]),
     MongooseModule.forFeature([{ name: 'News', schema: NewsSchema }]),
     MongooseModule.forFeature([
       { name: 'RefreshToken', schema: RefreshTokenSchema },
     ]),
-  MongooseModule.forRootAsync(
-    {
-      useFactory:()=>mongooseConfig,
-      
-    }
-  ),
+    MongooseModule.forRootAsync({
+      useFactory: () => mongooseConfig,
+    }),
     AuthModule,
     PokemonModule,
     EmailVerificationModule,
@@ -63,7 +62,12 @@ import { mongooseConfig } from 'src/mongoose.config';
     NewsModule,
     FavouritesModule,
   ],
-  controllers: [AppController, AuthController, NewsController,FavouritesController],
+  controllers: [
+    AppController,
+    AuthController,
+    NewsController,
+    FavouritesController,
+  ],
   providers: [
     JwtStrategy,
     UserService,

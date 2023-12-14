@@ -5,6 +5,6 @@ dotenv.config();
 
 const mongoUri = process.env.MONGO_URI;
 export const mongooseConfig: MongooseModuleOptions = {
-  uri:mongoUri,
+  uri: mongoUri,
   dbName: 'pokemon_db',
 };

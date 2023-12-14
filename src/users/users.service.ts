@@ -33,11 +33,9 @@ export class UserService {
   async findAllUsers() {
     const result = await this.userModel.find();
     return result.map((user) => ({
-      id: user.id,
       name: user.name,
       email: user.email,
       phone_number: user.phone_number,
-      password: user.password,
     }));
   }
 

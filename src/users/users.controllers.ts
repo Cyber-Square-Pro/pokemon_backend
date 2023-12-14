@@ -36,7 +36,7 @@ export class UsersController {
   }
   @Get()
   async getAllUsers() {
-    const result = this.usersService.findAllUsers();
+    const result = await this.usersService.findAllUsers();
     return result;
   }
   @Patch('reset-password')
