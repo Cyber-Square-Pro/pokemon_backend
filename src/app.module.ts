@@ -54,6 +54,7 @@ import { mongooseConfig } from 'src/mongoose.config';
     MongooseModule.forRootAsync({
       useFactory: () => mongooseConfig,
     }),
+
     AuthModule,
     PokemonModule,
     EmailVerificationModule,
