@@ -28,6 +28,10 @@ import { FavouritesController } from './favourites/favourites.controller';
 import { PokemonSchema } from './pokemon/pokemon.model';
 import { PokemonService } from './pokemon/pokemon.services';
 import { mongooseConfig } from 'src/mongoose.config';
+import { DailyCheckinController } from './daily.checkin/daily.checkin.controller';
+
+import { DailyCheckinModule } from './daily.checkin/daily.checkin.module';
+import { DailyCheckinSchema } from './daily.checkin/daily.checkin.model';
 
 @Module({
   imports: [
@@ -49,6 +53,9 @@ import { mongooseConfig } from 'src/mongoose.config';
     ]),
     MongooseModule.forFeature([{ name: 'News', schema: NewsSchema }]),
     MongooseModule.forFeature([
+      { name: 'DailyCheckin', schema: DailyCheckinSchema },
+    ]),
+    MongooseModule.forFeature([
       { name: 'RefreshToken', schema: RefreshTokenSchema },
     ]),
     MongooseModule.forRootAsync({
@@ -62,12 +69,14 @@ import { mongooseConfig } from 'src/mongoose.config';
     MailerModule,
     NewsModule,
     FavouritesModule,
+    DailyCheckinModule,
   ],
   controllers: [
     AppController,
     AuthController,
     NewsController,
     FavouritesController,
+    DailyCheckinController,
   ],
   providers: [
     JwtStrategy,
