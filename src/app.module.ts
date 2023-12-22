@@ -29,14 +29,16 @@ import { PokemonSchema } from './pokemon/pokemon.model';
 import { PokemonService } from './pokemon/pokemon.services';
 import { mongooseConfig } from 'src/mongoose.config';
 import { DailyCheckinController } from './daily.checkin/daily.checkin.controller';
-
 import { DailyCheckinModule } from './daily.checkin/daily.checkin.module';
 import { DailyCheckinSchema } from './daily.checkin/daily.checkin.model';
+import { DailyCheckinService } from './daily.checkin/daily.checkin.service';
+import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
   imports: [
-    PassportModule.register({ defaultStrategy: 'jwt' }),
+    ScheduleModule.forRoot(),
 
+    PassportModule.register({ defaultStrategy: 'jwt' }),
     JwtModule.register({
       secret: process.env.ACCESS_TOKEN_SECRET,
       signOptions: {
@@ -44,7 +46,6 @@ import { DailyCheckinSchema } from './daily.checkin/daily.checkin.model';
         expiresIn: '2m',
       },
     }),
-    UsersModule,
 
     MongooseModule.forFeature([{ name: 'User', schema: UserSchema }]),
     MongooseModule.forFeature([{ name: 'Pokemon', schema: PokemonSchema }]),
@@ -62,6 +63,7 @@ import { DailyCheckinSchema } from './daily.checkin/daily.checkin.model';
       useFactory: () => mongooseConfig,
     }),
 
+    UsersModule,
     AuthModule,
     PokemonModule,
     EmailVerificationModule,
@@ -88,6 +90,7 @@ import { DailyCheckinSchema } from './daily.checkin/daily.checkin.model';
     AuthService,
     NewsService,
     PokemonService,
+    DailyCheckinService,
   ],
 })
 export class AppModule {}
