@@ -21,7 +21,8 @@ export class DailyCheckinController {
     return this.checkinService.checkInUser(body.username);
   }
 
-  @Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT)
+  @Cron(CronExpression.EVERY_30_SECONDS)
+  @Post('auto-checkin')
   async checkInByCron() {
     await this.checkinService.createDailyCheckinByCron();
   }
