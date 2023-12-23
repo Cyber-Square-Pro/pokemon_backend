@@ -36,6 +36,7 @@ import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
   imports: [
+    // Cron scheduler
     ScheduleModule.forRoot(),
 
     PassportModule.register({ defaultStrategy: 'jwt' }),

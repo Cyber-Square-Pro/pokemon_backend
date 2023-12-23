@@ -1,21 +1,28 @@
 import { Body, Controller, Patch, Post } from '@nestjs/common';
 import { DailyCheckinService } from './daily.checkin.service';
+import { Cron, CronExpression } from '@nestjs/schedule';
+import { UserService } from 'src/users/users.service';
 
 @Controller('daily-checkin')
 export class DailyCheckinController {
-  constructor(private readonly checkinService: DailyCheckinService) {}
+  constructor(
+    private readonly checkinService: DailyCheckinService,
+    private readonly userService: UserService,
+  ) {}
 
   @Post('history')
-  getUserHistory(@Body() body: { username: string }) {
-    return this.checkinService.getCheckinHistory(body.username);
+  async getUserHistory(@Body() body: { username: string }) {
+    const user = await this.userService.findUserByName(body.username);
+    return await this.checkinService.getCheckinHistory(user);
   }
 
-  // @Post('is-checked-today')
-  // isCheckedToday(@Body() body: { username: string }) {
-  //   //
-  // }
   @Patch('check-in')
   checkIn(@Body() body: { username: string }) {
     return this.checkinService.checkInUser(body.username);
+  }
+
+  @Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT)
+  async checkInByCron() {
+    await this.checkinService.createDailyCheckinByCron();
   }
 }

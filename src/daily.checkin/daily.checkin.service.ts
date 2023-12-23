@@ -3,7 +3,6 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { User } from 'src/users/user.model';
 import { DailyCheckin } from './daily.checkin.model';
-import { Cron, CronExpression } from '@nestjs/schedule';
 
 @Injectable()
 export class DailyCheckinService {
@@ -30,8 +29,8 @@ export class DailyCheckinService {
   }
 
   // Get checkin history of user
-  async getCheckinHistory(username: string) {
-    const user = await this.userModel.findOne({ name: username }).exec();
+  async getCheckinHistory(user: User) {
+
 
     try {
       return await this.checkinModel.find({ user: user._id });
@@ -41,12 +40,10 @@ export class DailyCheckinService {
   }
 
   // DAILY CHECKIN RECORD FILLER CRON JOB
+  async createDailyCheckinByCron() {
+    const allUsers = await this.userModel.find();
 
-  @Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT)
-  async createDailyCheckin() {
-    const users = await this.userModel.find();
-
-    for (const user of users) {
+    for (const user of allUsers) {
       const existingCheckin = await this.checkinModel.findOne({
         user: user._id,
       });

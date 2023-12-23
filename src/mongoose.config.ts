@@ -13,3 +13,4 @@ export const mongooseConfig: MongooseModuleOptions = {
   uri: mongoUri,
   dbName: 'pokemon_db',
 };
+ 
