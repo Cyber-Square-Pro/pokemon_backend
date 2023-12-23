@@ -30,8 +30,6 @@ export class DailyCheckinService {
 
   // Get checkin history of user
   async getCheckinHistory(user: User) {
-
-
     try {
       return await this.checkinModel.find({ user: user._id });
     } catch (error) {
@@ -43,9 +41,20 @@ export class DailyCheckinService {
   async createDailyCheckinByCron() {
     const allUsers = await this.userModel.find();
 
+    // Set the start and end of the current day
+    const startOfDay = new Date();
+    startOfDay.setHours(0, 0, 0, 0);
+
+    const endOfDay = new Date();
+    endOfDay.setHours(23, 59, 59, 999);
+
     for (const user of allUsers) {
       const existingCheckin = await this.checkinModel.findOne({
         user: user._id,
+        createdAt: {
+          $gte: startOfDay,
+          $lt: endOfDay,
+        },
       });
       if (!existingCheckin) {
         await this.checkinModel.create({
@@ -54,6 +63,8 @@ export class DailyCheckinService {
           isCreatedByCron: true,
         });
         this.logger.debug(`Created daily check-in for user ${user.name}`);
+      }else{
+        console.log(`Record for today exists for ${user.name}`)
       }
     }
   }
