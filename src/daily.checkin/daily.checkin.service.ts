@@ -15,7 +15,7 @@ export class DailyCheckinService {
 
   // User checkins in manually for that day
   async checkInUser(username: string) {
-    // Might have to check if it is too late or not
+
     const user = await this.userModel.findOne({ name: username }).exec();
     try {
       await this.checkinModel.create({
@@ -32,6 +32,7 @@ export class DailyCheckinService {
   async getCheckinHistory(user: User) {
     try {
       return await this.checkinModel.find({ user: user._id });
+      
     } catch (error) {
       throw error;
     }
