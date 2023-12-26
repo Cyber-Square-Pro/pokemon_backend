@@ -4,7 +4,6 @@ import {
   Controller,
   Get,
   InternalServerErrorException,
-  NotFoundException,
   Patch,
   Post,
   UseGuards,
@@ -13,6 +12,7 @@ import { UserService } from './users.service';
 import { EmailVerificationService } from 'src/email.verification/email.verification.service';
 import { OtpService } from 'src/otp/otp.service';
 import { AuthGuard } from '@nestjs/passport';
+
 
 @Controller('users')
 export class UsersController {
@@ -87,7 +87,6 @@ export class UsersController {
     @Body('email') email: string,
     @Body('intent') intent: string,
   ) {
-
     const generatedOTP = this.otpService.generateOTP();
     await this.otpService.storeOTP(email, generatedOTP);
     const res = await this.emailVerificationService.sendOtpEmail(
@@ -95,7 +94,7 @@ export class UsersController {
       generatedOTP,
       intent,
     );
-    console.log(res)
+    console.log(res);
     if (res)
       return {
         message: `OTP has been sent to your mail-> OTP ${generatedOTP}`,

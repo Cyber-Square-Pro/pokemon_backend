@@ -9,6 +9,7 @@ import { EmailVerificationService } from '../email.verification/email.verificati
 import { MailerService } from '../mailer/mailer.service';
 import { OtpService } from '../otp/otp.service';
 import { OtpSchema } from '../otp/otp.model';
+import { CreditsSchema } from 'src/credits/credits.model';
 
 @Module({
   imports: [

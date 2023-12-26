@@ -86,10 +86,10 @@ export class UserService {
   }
 
   //Verifying user email
-  async setEmailToVerified(email:string){
-    const user = await this.userModel.findOne({email:email}).exec()
+  async setEmailToVerified(email: string) {
+    const user = await this.userModel.findOne({ email: email }).exec();
     user.verified_email = true;
-    return user.save()
+    return user.save();
   }
 
   // Deleting a user from the db

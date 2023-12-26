@@ -33,6 +33,10 @@ import { DailyCheckinModule } from './daily.checkin/daily.checkin.module';
 import { DailyCheckinSchema } from './daily.checkin/daily.checkin.model';
 import { DailyCheckinService } from './daily.checkin/daily.checkin.service';
 import { ScheduleModule } from '@nestjs/schedule';
+import { CreditsModule } from './credits/credits.module';
+import { CreditsSchema } from './credits/credits.model';
+import { CreditsController } from './credits/credits.controller';
+import { CreditsService } from './credits/credits.service';
 
 @Module({
   imports: [
@@ -50,6 +54,7 @@ import { ScheduleModule } from '@nestjs/schedule';
 
     MongooseModule.forFeature([{ name: 'User', schema: UserSchema }]),
     MongooseModule.forFeature([{ name: 'Pokemon', schema: PokemonSchema }]),
+    MongooseModule.forFeature([{ name: 'Credits', schema: CreditsSchema }]),
     MongooseModule.forFeature([
       { name: 'Favourite', schema: FavouritesSchema },
     ]),
@@ -73,6 +78,7 @@ import { ScheduleModule } from '@nestjs/schedule';
     NewsModule,
     FavouritesModule,
     DailyCheckinModule,
+    CreditsModule,
   ],
   controllers: [
     AppController,
@@ -80,6 +86,7 @@ import { ScheduleModule } from '@nestjs/schedule';
     NewsController,
     FavouritesController,
     DailyCheckinController,
+    CreditsController,
   ],
   providers: [
     JwtStrategy,
@@ -92,6 +99,7 @@ import { ScheduleModule } from '@nestjs/schedule';
     NewsService,
     PokemonService,
     DailyCheckinService,
+    CreditsService,
   ],
 })
 export class AppModule {}
