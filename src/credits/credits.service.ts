@@ -17,7 +17,7 @@ export class CreditsService {
       throw error;
     }
   }
-  async getCredits(user: User) {
+  async getCredits(user: User):Promise<Credits> {
     try {
       return await this.creditModel.findOne({ user: user }).exec();
     } catch (error) {

@@ -12,7 +12,8 @@ export class CreditsController {
   @Post()
   async getCredits(@Body() body: { username: string }) {
     const user = await this.userService.findUserByName(body.username);
-    return this.creditService.getCredits(user);
+    const result = await this.creditService.getCredits(user);
+    return result.credits;
   }
 
   @Post('create')
