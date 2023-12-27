@@ -35,4 +35,14 @@ export class CreditsService {
       throw error;
     }
   }
+  async spendCredits(user: User,amount:number) {
+    try {
+      const creditData = await this.creditModel.findOne({ user: user });
+      const current = creditData.credits as number;
+      creditData.credits = current - amount;
+      creditData.save();
+    } catch (error) {
+      throw error;
+    }
+  }
 }

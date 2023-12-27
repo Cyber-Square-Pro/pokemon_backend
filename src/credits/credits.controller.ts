@@ -1,19 +1,35 @@
 import { Body, Controller, Patch, Post } from '@nestjs/common';
 import { UserService } from 'src/users/users.service';
+import { CreditsService } from './credits.service';
 
 @Controller('credits')
 export class CreditsController {
-  constructor(private readonly userService: UserService) {}
+  constructor(
+    private readonly userService: UserService,
+    private readonly creditService: CreditsService,
+  ) {}
 
   @Post()
-  async getCredits(@Body() body: { username: string }) {}
+  async getCredits(@Body() body: { username: string }) {
+    const user = await this.userService.findUserByName(body.username);
+    return this.creditService.getCredits(user);
+  }
 
   @Post('create')
-  async createAccount(@Body() body: { username: string }) {}
+  async createAccount(@Body() body: { username: string }) {
+    const user = await this.userService.findUserByName(body.username);
+    return this.creditService.createAccount(user);
+  }
 
   @Patch('add')
-  async addCredits(@Body() body: { username: string }) {}
+  async addCredits(@Body() body: { username: string }) {
+    const user = await this.userService.findUserByName(body.username);
+    return this.creditService.addCredits(user);
+  }
 
   @Patch('spend')
-  async spendCredits(@Body() body: { username: string; amount: number }) {}
+  async spendCredits(@Body() body: { username: string; amount: number }) {
+    const user = await this.userService.findUserByName(body.username);
+    return this.creditService.spendCredits(user, body.amount);
+  }
 }
