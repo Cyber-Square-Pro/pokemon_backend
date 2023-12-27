@@ -12,14 +12,14 @@ export class CreditsService {
 
   async createAccount(user: User) {
     try {
-      await this.creditModel.create({ user: user });
+      return await this.creditModel.create({ user: user });
     } catch (error) {
       throw error;
     }
   }
   async getCredits(user: User) {
     try {
-      await this.creditModel.findOne({ user: user }).exec();
+      return await this.creditModel.findOne({ user: user }).exec();
     } catch (error) {
       throw error;
     }
