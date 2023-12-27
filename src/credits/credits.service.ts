@@ -12,14 +12,14 @@ export class CreditsService {
 
   async createAccount(user: User) {
     try {
-      return await this.creditModel.create({ user: user });
+      return await this.creditModel.create({ user: user._id });
     } catch (error) {
       throw error;
     }
   }
   async getCredits(user: User):Promise<Credits> {
     try {
-      return await this.creditModel.findOne({ user: user }).exec();
+      return await this.creditModel.findOne({ user: user._id }).exec();
     } catch (error) {
       throw error;
     }
@@ -27,7 +27,7 @@ export class CreditsService {
   async addCredits(user: User) {
     const reward = Number.parseFloat(process.env.DAILY_REWARD);
     try {
-      const creditData = await this.creditModel.findOne({ user: user });
+      const creditData = await this.creditModel.findOne({ user: user._id });
       const current = creditData.credits as number;
       creditData.credits = current + reward;
       creditData.save();
@@ -37,7 +37,7 @@ export class CreditsService {
   }
   async spendCredits(user: User,amount:number) {
     try {
-      const creditData = await this.creditModel.findOne({ user: user });
+      const creditData = await this.creditModel.findOne({ user: user._id });
       const current = creditData.credits as number;
       creditData.credits = current - amount;
       creditData.save();

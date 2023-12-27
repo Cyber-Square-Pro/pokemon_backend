@@ -1,4 +1,3 @@
-// auth.controller.ts
 import {
   Controller,
   Post,
@@ -30,7 +29,12 @@ export class AuthController {
     @Body('password') password: string,
   ): Promise<User> {
     console.log('/register endpoint called');
-    const user = await this.authService.register(username, email, phone, password);
+    const user = await this.authService.register(
+      username,
+      email,
+      phone,
+      password,
+    );
     await this.creditsService.createAccount(user);
     return user;
   }
@@ -52,7 +56,7 @@ export class AuthController {
     if (result) {
       return result;
     } else {
-      // return { message: 'Invalid refresh token.' };
+
       throw new UnauthorizedException(
         'Could not to generate new access token!',
       );

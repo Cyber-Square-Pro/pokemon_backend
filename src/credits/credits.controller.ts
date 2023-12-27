@@ -9,6 +9,7 @@ export class CreditsController {
     private readonly userService: UserService,
     private readonly creditService: CreditsService,
   ) {}
+  
   @UseGuards(AuthGuard('jwt'))
   @Post()
   async getCredits(@Body() body: { username: string }) {
