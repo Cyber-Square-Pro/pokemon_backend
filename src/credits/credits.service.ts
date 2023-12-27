@@ -3,7 +3,6 @@ import { Credits } from './credits.model';
 import { Model } from 'mongoose';
 import { User } from 'src/users/user.model';
 import { InjectModel } from '@nestjs/mongoose';
-import { Double } from 'mongodb';
 
 @Injectable()
 export class CreditsService {
@@ -31,9 +30,10 @@ export class CreditsService {
       const creditData = await this.creditModel
         .findOne({ user: user._id })
         .exec();
-      const current = creditData.credits as number;
+      const current = Number.parseFloat(creditData.credits as string);
       console.log(current, ' : ', creditData.credits);
-      creditData.credits = current + reward  ?? 25.00;
+      const total = current + reward ?? 25.0;
+      creditData.credits = total.toString();
       return creditData.save();
     } catch (error) {
       throw error;
@@ -44,8 +44,9 @@ export class CreditsService {
       const creditData = await this.creditModel
         .findOne({ user: user._id })
         .exec();
-      const current = creditData.credits as number;
-      creditData.credits = current - amount;
+      const current = Number.parseFloat(creditData.credits.toString());
+      const remaining = current - amount;
+      creditData.credits = remaining.toString();
       return creditData.save();
     } catch (error) {
       throw error;

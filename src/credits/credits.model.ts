@@ -5,8 +5,8 @@ import { Double, ObjectId } from 'mongodb';
 export class Credits {
   @Prop({ required: true, ref: 'User' })
   user: ObjectId;
-  @Prop({ default: 0.00 })
-  credits: Number;
+  @Prop({ default: "0.00" })
+  credits: String;
 }
 export type CreditsDocument = Credits & Document;
 
