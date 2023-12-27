@@ -3,6 +3,7 @@ import { Credits } from './credits.model';
 import { Model } from 'mongoose';
 import { User } from 'src/users/user.model';
 import { InjectModel } from '@nestjs/mongoose';
+import { Double } from 'mongodb';
 
 @Injectable()
 export class CreditsService {
@@ -32,15 +33,17 @@ export class CreditsService {
         .exec();
       const current = creditData.credits as number;
       console.log(current, ' : ', creditData.credits);
-      creditData.credits = current + reward ?? 25.0;
-     return creditData.save();
+      creditData.credits = current + reward  ?? 25.00;
+      return creditData.save();
     } catch (error) {
       throw error;
     }
   }
   async spendCredits(user: User, amount: number) {
     try {
-      const creditData = await this.creditModel.findOne({ user: user._id }).exec();
+      const creditData = await this.creditModel
+        .findOne({ user: user._id })
+        .exec();
       const current = creditData.credits as number;
       creditData.credits = current - amount;
       return creditData.save();
