@@ -27,20 +27,23 @@ export class CreditsService {
   async addCredits(user: User) {
     const reward = Number.parseFloat(process.env.DAILY_REWARD);
     try {
-      const creditData = await this.creditModel.findOne({ user: user._id });
+      const creditData = await this.creditModel
+        .findOne({ user: user._id })
+        .exec();
       const current = creditData.credits as number;
-      creditData.credits = current + reward;
-      creditData.save();
+      console.log(current, ' : ', creditData.credits);
+      creditData.credits = current + reward ?? 25.0;
+     return creditData.save();
     } catch (error) {
       throw error;
     }
   }
-  async spendCredits(user: User,amount:number) {
+  async spendCredits(user: User, amount: number) {
     try {
-      const creditData = await this.creditModel.findOne({ user: user._id });
+      const creditData = await this.creditModel.findOne({ user: user._id }).exec();
       const current = creditData.credits as number;
       creditData.credits = current - amount;
-      creditData.save();
+      return creditData.save();
     } catch (error) {
       throw error;
     }
