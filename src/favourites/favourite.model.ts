@@ -1,20 +1,15 @@
-import mongoose, { Schema } from 'mongoose';
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { ObjectId } from 'mongodb';
+import { Document } from 'mongoose';
 
-export const FavouritesSchema = new mongoose.Schema(
-  {
-    user: {
-      type: String,
-      required: true,
-    },
-    pokemon: {
-      type: [String],
-      default: [],
-    },
-  },
-  { collection: 'favourites' },
-);
+@Schema({ timestamps: true, collection: 'favourites' })
+export class Favourite {
+  @Prop({ required: true, ref:'User' })
+  user: ObjectId;
 
-export interface Favourite extends mongoose.Document {
-  user: string;
+  @Prop({ type: Array<String>, default: [], unique: true })
   pokemon: string[];
 }
+
+export type FavouriteDocument = Favourite & Document;
+export const FavouritesSchema = SchemaFactory.createForClass(Favourite);

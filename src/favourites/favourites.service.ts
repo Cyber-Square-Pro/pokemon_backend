@@ -17,22 +17,20 @@ export class FavouritesService {
 
   async getFavourites(user: User): Promise<string[]> {
     const favourites = await this.favouritesModel
-      .findOne({ user: user.name })
+      .findOne({ user: user._id })
       .exec();
-    console.log(favourites);
+
     if (favourites) return favourites.pokemon;
     else return null;
   }
   async saveFavourite(user: User, favourite: string) {
-    const doc = await this.favouritesModel.findOne({ user: user.name }).exec();
-    if (doc!=null) {
-      console.log(doc);
-      console.log(favourite);
+    const doc = await this.favouritesModel.findOne({ user: user._id }).exec();
+    if (doc != null) {
       doc.pokemon.push(favourite);
       return doc.save();
     } else {
       const doc = await this.favouritesModel.create({
-        user: user.name,
+        user: user._id,
         pokemon: [favourite],
       });
       return doc.save();
@@ -40,14 +38,15 @@ export class FavouritesService {
   }
 
   async containsFavourite(user: User, fav: string): Promise<boolean> {
-    const favourites = await this.favouritesModel.findOne({ user: user.name });
+    const favourites = await this.favouritesModel.findOne({ user: user._id });
+    console.log(favourites.pokemon.includes(fav));
     if (!favourites) return false;
     else return favourites.pokemon.includes(fav);
   }
 
   async removeFavourite(user: User, fav: string) {
     try {
-      let favourite = await this.favouritesModel.findOne({ user: user.name });
+      let favourite = await this.favouritesModel.findOne({ user: user._id });
       favourite.pokemon = favourite.pokemon.filter((item) => item != fav);
       await favourite.save();
     } catch (error) {

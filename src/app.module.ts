@@ -48,7 +48,7 @@ import { CreditsService } from './credits/credits.service';
       secret: process.env.ACCESS_TOKEN_SECRET,
       signOptions: {
         algorithm: 'HS256',
-        expiresIn: '2m',
+        expiresIn: '5m',
       },
     }),
 
