@@ -1,8 +1,8 @@
 import {
-  BadRequestException,
-  Injectable,
-  InternalServerErrorException,
-  NotFoundException,
+    ConflictException,
+    Injectable,
+    InternalServerErrorException,
+    NotFoundException,
 } from '@nestjs/common';
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
@@ -11,46 +11,58 @@ import { User } from 'src/users/user.model';
 
 @Injectable()
 export class FavouritesService {
-  constructor(
-    @InjectModel('Favourite') readonly favouritesModel: Model<Favourite>,
-  ) {}
+    constructor(
+        @InjectModel('Favourite') readonly favouritesModel: Model<Favourite>,
+    ) {}
 
-  async getFavourites(user: User): Promise<string[]> {
-    const favourites = await this.favouritesModel
-      .findOne({ user: user._id })
-      .exec();
+    async getFavourites(user: User) {
+        const favourites = await this.favouritesModel
+            .find({ user: user._id })
+            .exec();
+        let id: string[] = [];
+        favourites.map((fav) => id.push(fav.pokemon));
 
-    if (favourites) return favourites.pokemon;
-    else return null;
-  }
-  async saveFavourite(user: User, favourite: string) {
-    const doc = await this.favouritesModel.findOne({ user: user._id }).exec();
-    if (doc != null) {
-      doc.pokemon.push(favourite);
-      return doc.save();
-    } else {
-      const doc = await this.favouritesModel.create({
-        user: user._id,
-        pokemon: [favourite],
-      });
-      return doc.save();
+        return id;
     }
-  }
-
-  async containsFavourite(user: User, fav: string): Promise<boolean> {
-    const favourites = await this.favouritesModel.findOne({ user: user._id });
-    console.log(favourites.pokemon.includes(fav));
-    if (!favourites) return false;
-    else return favourites.pokemon.includes(fav);
-  }
-
-  async removeFavourite(user: User, fav: string) {
-    try {
-      let favourite = await this.favouritesModel.findOne({ user: user._id });
-      favourite.pokemon = favourite.pokemon.filter((item) => item != fav);
-      await favourite.save();
-    } catch (error) {
-      throw new InternalServerErrorException(error);
+    async saveFavourite(user: User, favourite: string) {
+        const doc = await this.favouritesModel
+            .findOne({
+                user: user._id,
+                pokemon: favourite,
+            })
+            .exec();
+        if (doc) {
+            console.log('already exists');
+            throw new ConflictException('Favourite already exists');
+        } else {
+            await this.favouritesModel.create({
+                user: user._id,
+                pokemon: favourite,
+            });
+        }
     }
-  }
+
+    async containsFavourite(user: User, fav: string) {
+        let favourite = await this.favouritesModel.findOne({
+            user: user._id,
+            pokemon: fav,
+        });
+
+        if (!favourite)
+            throw new NotFoundException(
+                "User's collection does not contain this favourite",
+            );
+        else return true;
+    }
+
+    async removeFavourite(user: User, fav: string) {
+        try {
+            await this.favouritesModel.deleteOne({
+                user: user._id,
+                pokemon: fav,
+            });
+        } catch (error) {
+            throw new InternalServerErrorException(error);
+        }
+    }
 }

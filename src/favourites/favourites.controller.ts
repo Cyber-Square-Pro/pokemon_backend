@@ -1,4 +1,12 @@
-import { Body, Controller, Delete, Patch, Post, Put, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Patch,
+  Post,
+  Put,
+  UseGuards,
+} from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { FavouritesService } from './favourites.service';
 import { UserService } from 'src/users/users.service';
@@ -38,7 +46,7 @@ export class FavouritesController {
     @Body() body: { username: string; favourite: string },
   ) {
     const user = await this.usersService.findUserByName(body.username);
-    return await this.favouritesService.containsFavourite(user,body.favourite);
+    return await this.favouritesService.containsFavourite(user, body.favourite);
   }
 
   @Delete('remove')

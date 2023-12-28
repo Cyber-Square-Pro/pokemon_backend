@@ -4,11 +4,11 @@ import { Document } from 'mongoose';
 
 @Schema({ timestamps: true, collection: 'favourites' })
 export class Favourite {
-  @Prop({ required: true, ref:'User' })
-  user: ObjectId;
+    @Prop({ required: true, ref: 'User' })
+    user: ObjectId;
 
-  @Prop({ type: Array<String>, default: [], unique: true })
-  pokemon: string[];
+    @Prop({ type: String, unique: true })
+    pokemon: string;
 }
 
 export type FavouriteDocument = Favourite & Document;
