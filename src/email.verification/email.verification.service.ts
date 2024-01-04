@@ -9,7 +9,7 @@ export class EmailVerificationService {
     email: string,
     otp: number,
     intent: string,
-  ): Promise<boolean> {
+  ) {
     console.log(intent)
     if (intent == 'SIGN_UP') {
       return await this.mailService.sendVerificationEmail(email, otp);

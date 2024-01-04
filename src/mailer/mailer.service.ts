@@ -1,41 +1,59 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import * as nodemailer from 'nodemailer';
 @Injectable()
 export class MailerService {
-  //constructor(){
-  //   this.transporter = nodemailer.createTransport({
-  //     host:'live.smtp.mailtrap.io',
-  //     port:2525,
-  //     auth: {
-  //       user: this.envUser,
-  //       pass: this.envPass
-  //     },
-  //   })
-  // }
-  //}
+    private transporter = nodemailer.createTransport({
+        host: 'smtp-relay.brevo.com',
+        port: 587,
+        auth: {
+            user: process.env.BREVO_USER,
+            pass: process.env.BREVO_PASSWORD,
+        },
+        authMethod:'PLAIN'
+    });
 
-  // async sendVerificationEmail(email: string, otp: number) {
-  //   const mailOptions = {
-  //     from: 'pokemon.team.b@gmail.com',
-  //     to: email,
-  //     subject: 'Email Verification for Pokemon App',
-  //     text: `Your verification OTP Number is as follows: ${otp} \n`,
-  //   };
+    constructor() {}
 
-  //   try {
-  //     const result = await this.transporter.sendMail(mailOptions);
-  //     console.log('Email sent:', result);
-  //     return result;
-  //   } catch (error) {
-  //     console.error('Error sending email:', error);
-  //     throw error; // rethrow the error to propagate it further
-  //   }
-  // }
+    async sendVerificationEmail(email: string, otp: number) {
+        const mailOptions = {
+            from: 'pokedex-team-b@cybersquare.com',
+            to: email,
+            subject: 'Email Verification for Pokedex App',
+            text: `Your verification OTP Number is as follows: ${otp} \n`,
+        };
 
-  async sendResetEmail(email: string, otp: number) {
-    return true;
-  }
-  async sendVerificationEmail(email: string, otp: number) {
-    return true;
-  }
+        try {
+            const result = await this.transporter.sendMail(mailOptions);
+            console.log('Email sent:', result);
+            return result;
+        } catch (error) {
+            console.error('Error sending email:', error);
+            throw new InternalServerErrorException('Failed to send email'); // rethrow the error to propagate it further
+        }
+    }
+
+    async sendResetEmail(email: string, otp: number) {
+        const mailOptions = {
+            from: 'Pokedex Team B',
+            to: email,
+            subject: 'Reset password for Pokedex App',
+            text: `Your OTP Number for resetting your password is as follows: ${otp} \n`,
+        };
+
+        try {
+            const result = await this.transporter.sendMail(mailOptions);
+            console.log('Email sent', result);
+            return result;
+        } catch (error) {
+            console.error('Error sending email:', error);
+            throw new InternalServerErrorException('Failed to send email');
+        }
+    }
+
+    // async sendResetEmail(email: string, otp: number) {
+    //     return true;
+    // }
+    // async sendVerificationEmail(email: string, otp: number) {
+    //     return true;
+    // }
 }

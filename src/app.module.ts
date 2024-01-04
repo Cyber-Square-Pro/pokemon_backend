@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Global, MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { UsersModule } from './users/users.module';
@@ -37,69 +37,82 @@ import { CreditsModule } from './credits/credits.module';
 import { CreditsSchema } from './credits/credits.model';
 import { CreditsController } from './credits/credits.controller';
 import { CreditsService } from './credits/credits.service';
+import { ApiKeyStrategy } from './auth/api.key.strategy';
+import { ApiKeyGuard } from './auth/api.key.guard';
+import { APP_GUARD } from '@nestjs/core';
 
+@Global()
 @Module({
-  imports: [
-    // Cron scheduler
-    ScheduleModule.forRoot(),
+    imports: [
+        PassportModule,
+        // Cron scheduler
+        ScheduleModule.forRoot(),
 
-    PassportModule.register({ defaultStrategy: 'jwt' }),
-    JwtModule.register({
-      secret: process.env.ACCESS_TOKEN_SECRET,
-      signOptions: {
-        algorithm: 'HS256',
-        expiresIn: '5m',
-      },
-    }),
+        PassportModule.register({ defaultStrategy: 'jwt' }),
+        JwtModule.register({
+            secret: process.env.ACCESS_TOKEN_SECRET,
+            signOptions: {
+                algorithm: 'HS256',
+                expiresIn: '5m',
+            },
+        }),
 
-    MongooseModule.forFeature([{ name: 'User', schema: UserSchema }]),
-    MongooseModule.forFeature([{ name: 'Pokemon', schema: PokemonSchema }]),
-    MongooseModule.forFeature([{ name: 'Credits', schema: CreditsSchema }]),
-    MongooseModule.forFeature([
-      { name: 'Favourite', schema: FavouritesSchema },
-    ]),
-    MongooseModule.forFeature([{ name: 'News', schema: NewsSchema }]),
-    MongooseModule.forFeature([
-      { name: 'DailyCheckin', schema: DailyCheckinSchema },
-    ]),
-    MongooseModule.forFeature([
-      { name: 'RefreshToken', schema: RefreshTokenSchema },
-    ]),
-    MongooseModule.forRootAsync({
-      useFactory: () => mongooseConfig,
-    }),
+        MongooseModule.forFeature([{ name: 'User', schema: UserSchema }]),
+        MongooseModule.forFeature([{ name: 'Pokemon', schema: PokemonSchema }]),
+        MongooseModule.forFeature([{ name: 'Credits', schema: CreditsSchema }]),
+        MongooseModule.forFeature([
+            { name: 'Favourite', schema: FavouritesSchema },
+        ]),
+        MongooseModule.forFeature([{ name: 'News', schema: NewsSchema }]),
+        MongooseModule.forFeature([
+            { name: 'DailyCheckin', schema: DailyCheckinSchema },
+        ]),
+        MongooseModule.forFeature([
+            { name: 'RefreshToken', schema: RefreshTokenSchema },
+        ]),
+        MongooseModule.forRootAsync({
+            useFactory: () => mongooseConfig,
+        }),
 
-    UsersModule,
-    AuthModule,
-    PokemonModule,
-    EmailVerificationModule,
-    OtpModule,
-    MailerModule,
-    NewsModule,
-    FavouritesModule,
-    DailyCheckinModule,
-    CreditsModule,
-  ],
-  controllers: [
-    AppController,
-    AuthController,
-    NewsController,
-    FavouritesController,
-    DailyCheckinController,
-    CreditsController,
-  ],
-  providers: [
-    JwtStrategy,
-    UserService,
-    JwtService,
-    AppService,
-    MailerService,
-    RefreshTokenService,
-    AuthService,
-    NewsService,
-    PokemonService,
-    DailyCheckinService,
-    CreditsService,
-  ],
+        UsersModule,
+        AuthModule,
+        PokemonModule,
+        EmailVerificationModule,
+        OtpModule,
+        MailerModule,
+        NewsModule,
+        FavouritesModule,
+        DailyCheckinModule,
+        CreditsModule,
+    ],
+    controllers: [
+        AppController,
+        AuthController,
+        NewsController,
+        FavouritesController,
+        DailyCheckinController,
+        CreditsController,
+    ],
+    providers: [
+        ApiKeyStrategy,
+        JwtStrategy,
+        UserService,
+        JwtService,
+        AppService,
+        MailerService,
+        RefreshTokenService,
+        AuthService,
+        NewsService,
+        PokemonService,
+        DailyCheckinService,
+        CreditsService,
+
+        {
+            provide: APP_GUARD,
+            useClass: ApiKeyGuard,
+        },
+    ],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+    configure(consumer: MiddlewareConsumer) {}
+}
