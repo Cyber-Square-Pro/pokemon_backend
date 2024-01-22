@@ -34,7 +34,7 @@ export class MailerService {
 
     async sendResetEmail(email: string, otp: number) {
         const mailOptions = {
-            from: 'Pokedex Team B',
+            from: 'pokedex_teamb@cybersquare.org',
             to: email,
             subject: 'Reset password for Pokedex App',
             text: `Your OTP Number for resetting your password is as follows: ${otp} \n`,
